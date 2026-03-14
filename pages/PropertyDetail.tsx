@@ -171,9 +171,13 @@ const PropertyDetail: React.FC = () => {
   };
 
   // --- MAP LINKS HELPER ---
+  const locationString = typeof property.location === 'object' && property.location !== null 
+    ? (property.location as any).name || '' 
+    : property.location;
+
   const mapQuery = property.coordinates 
     ? `${property.coordinates.lat},${property.coordinates.lng}` 
-    : property.location;
+    : locationString;
 
   const externalMapUrl = property.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
   const embedMapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
@@ -341,7 +345,7 @@ const PropertyDetail: React.FC = () => {
                 <div className="flex flex-col md:flex-row md:items-center gap-4 text-gray-500">
                     <div className="flex items-center gap-2">
                         <MapPin size={18} className="text-accent" /> 
-                        <span className="text-base font-medium">{property.location}</span>
+                        <span className="text-base font-medium">{locationString}</span>
                     </div>
                 </div>
            </div>

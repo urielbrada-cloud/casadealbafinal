@@ -56,7 +56,12 @@ const SearchResults: React.FC = () => {
     let activeFilters = false;
 
     if (locationFilter) {
-      results = results.filter(p => p.location.toLowerCase().includes(locationFilter.toLowerCase()));
+      results = results.filter(p => {
+        const locStr = typeof p.location === 'object' && p.location !== null 
+          ? (p.location as any).name || ''
+          : p.location;
+        return locStr.toLowerCase().includes(locationFilter.toLowerCase());
+      });
       activeFilters = true;
     }
 

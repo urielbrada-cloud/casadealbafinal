@@ -239,7 +239,11 @@ const AdminPage: React.FC = () => {
                            <img src={prop.images[0]} alt="" className="w-12 h-12 rounded-lg object-cover bg-gray-200" />
                         </td>
                         <td className="px-6 py-4 font-medium text-primary">{prop.title}</td>
-                        <td className="px-6 py-4 text-gray-500 text-sm">{prop.location}</td>
+                        <td className="px-6 py-4 text-gray-500 text-sm">
+                           {typeof prop.location === 'object' && prop.location !== null 
+                             ? (prop.location as any).name || '' 
+                             : prop.location}
+                        </td>
                         <td className="px-6 py-4 text-accent font-bold text-sm">{prop.price}</td>
                         <td className="px-6 py-4 text-right">
                            <div className="flex justify-end gap-2">
@@ -289,7 +293,7 @@ const AdminPage: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                      <div className="space-y-2">
                         <label className="text-xs font-bold uppercase text-gray-400">Ubicación</label>
-                        <input type="text" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none focus:border-accent" />
+                        <input type="text" value={typeof formData.location === 'object' && formData.location !== null ? (formData.location as any).name || '' : formData.location} onChange={e => setFormData({...formData, location: e.target.value})} className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none focus:border-accent" />
                      </div>
                      <div className="space-y-2">
                         <label className="text-xs font-bold uppercase text-gray-400">Tipo</label>

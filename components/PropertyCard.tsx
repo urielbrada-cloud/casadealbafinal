@@ -122,7 +122,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, variant = 'portra
           
           <div className="flex items-center gap-1.5 text-gray-500 text-sm mb-6">
             <MapPin size={14} className="text-gray-400" />
-            <span className="truncate">{property.location}</span>
+            <span className="truncate">
+              {typeof property.location === 'object' && property.location !== null 
+                ? (property.location as any).name || '' 
+                : property.location}
+            </span>
           </div>
           
           <div className="mt-auto flex items-center justify-between text-gray-400 text-sm pt-4 border-t border-gray-100">
