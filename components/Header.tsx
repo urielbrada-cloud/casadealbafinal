@@ -8,6 +8,7 @@ import SmartSearch from './SmartSearch';
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDesktopMenuOpen, setIsDesktopMenuOpen] = useState(false);
   const location = useLocation();
 
   const isHomePage = location.pathname === '/';
@@ -81,14 +82,31 @@ const Header: React.FC = () => {
         {/* GRUPO DERECHO: MENÚ DE NAVEGACIÓN + ACCIONES */}
         <div className="flex items-center gap-6 lg:gap-8 shrink-0">
           
-          {/* Desktop Nav - Consolidated Links */}
-          <nav className="hidden xl:flex items-center gap-6 lg:gap-8">
-            <Link to="/propiedades" className={linkBaseClass}>Propiedades</Link>
-            <Link to="/desarrollos" className={linkBaseClass}>Desarrollos</Link>
-            <Link to="/servicios" className={linkBaseClass}>Servicios</Link>
-            <Link to="/journal" className={linkBaseClass}>Editorial</Link>
-            <Link to="/nosotros" className={linkBaseClass}>Nosotros</Link>
-          </nav>
+          {/* Desktop Nav - Dropdown Menu */}
+          <div 
+            className="hidden xl:block relative"
+            onMouseEnter={() => setIsDesktopMenuOpen(true)}
+            onMouseLeave={() => setIsDesktopMenuOpen(false)}
+          >
+            <button className={`${linkBaseClass} py-2 flex items-center gap-2`}>
+              Explorar
+            </button>
+            
+            {/* Dropdown Content */}
+            <div className={`
+              absolute top-full right-0 mt-4 bg-white/95 backdrop-blur-md shadow-xl rounded-2xl py-6 px-8 min-w-[220px] flex flex-col gap-5
+              transition-all duration-500 ease-in-out transform origin-top-right border border-gray-100
+              ${isDesktopMenuOpen 
+                ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' 
+                : 'opacity-0 -translate-y-4 scale-95 pointer-events-none'}
+            `}>
+              <Link to="/propiedades" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Propiedades</Link>
+              <Link to="/desarrollos" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Desarrollos</Link>
+              <Link to="/servicios" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Servicios</Link>
+              <Link to="/journal" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Editorial</Link>
+              <Link to="/nosotros" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Nosotros</Link>
+            </div>
+          </div>
           
           {/* Action Buttons */}
           <div className="flex items-center gap-4">
