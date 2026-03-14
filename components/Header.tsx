@@ -94,17 +94,19 @@ const Header: React.FC = () => {
             
             {/* Dropdown Content */}
             <div className={`
-              absolute top-full right-0 mt-4 bg-white/95 backdrop-blur-md shadow-xl rounded-2xl py-6 px-8 min-w-[220px] flex flex-col gap-5
-              transition-all duration-500 ease-in-out transform origin-top-right border border-gray-100
+              absolute top-full right-0 pt-4
+              transition-all duration-500 ease-in-out transform origin-top-right
               ${isDesktopMenuOpen 
                 ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' 
                 : 'opacity-0 -translate-y-4 scale-95 pointer-events-none'}
             `}>
-              <Link to="/propiedades" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Propiedades</Link>
-              <Link to="/desarrollos" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Desarrollos</Link>
-              <Link to="/servicios" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Servicios</Link>
-              <Link to="/journal" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Editorial</Link>
-              <Link to="/nosotros" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Nosotros</Link>
+              <div className="bg-white/95 backdrop-blur-md shadow-xl rounded-2xl py-6 px-8 min-w-[220px] flex flex-col gap-5 border border-gray-100">
+                <Link to="/propiedades" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Propiedades</Link>
+                <Link to="/desarrollos" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Desarrollos</Link>
+                <Link to="/servicios" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Servicios</Link>
+                <Link to="/journal" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Editorial</Link>
+                <Link to="/nosotros" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Nosotros</Link>
+              </div>
             </div>
           </div>
           
