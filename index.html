@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Casa de Alba | Luxury Real Estate</title>
+    
+    <!-- Preload Critical Assets -->
+    <link rel="preload" href="https://lh3.googleusercontent.com/d/139pJ7EwmqcEscmetvxfTkBJPGh22CJ32" as="image">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+     crossorigin="anonymous"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              background: '#dfdfdf',
+              primary: '#000827',
+              accent: '#e25c21',
+              'surface-commercial': '#1a1a1a',
+              'surface-light': '#f4f4f4',
+            },
+            fontFamily: {
+              serif: ['"DM Serif Display"', 'serif'],
+              sans: ['"DM Sans"', 'sans-serif'],
+            },
+            borderRadius: {
+              'xl': '24px',
+              '2xl': '32px',
+            },
+            letterSpacing: {
+              'tight-heading': '-0.06em', // Maximum tightness for editorial look
+              'wide-ui': '0.15em', // Increased spacing for UI elements for contrast
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #dfdfdf;
+        color: #000827;
+        font-family: 'DM Sans', sans-serif;
+        line-height: 1.6; /* Increased global line height */
+      }
+      /* Hide scrollbar for clean horizontal scroll */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      
+      /* Smooth text rendering */
+      h1, h2, h3, h4, h5, h6 {
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.13.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.40.0",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.39.3",
+    "react": "https://esm.sh/react@^19.2.4",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "react-dom": "https://esm.sh/react-dom@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <!-- 
+      NETLIFY FORMS REGISTRATION 
+      Usamos un div oculto con style display:none para asegurar que Vite no elimine estos elementos
+      y que Netlify pueda detectarlos correctamente con data-netlify="true".
+    -->
+    <div style="display: none;">
+      
+      <!-- 1. Newsletter Footer -->
+      <form name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+        <input type="hidden" name="bot-field" />
+        <input type="hidden" name="form-name" value="newsletter" />
+        <input type="email" name="email" />
+      </form>
+
+      <!-- 2. Property Contact Modal -->
+      <form name="property-contact" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+        <input type="hidden" name="bot-field" />
+        <input type="hidden" name="form-name" value="property-contact" />
+        <input type="text" name="name" />
+        <input type="email" name="email" />
+        <input type="text" name="phone" />
+        <input type="text" name="property-title" />
+        <input type="text" name="contact-type" />
+      </form>
+
+      <!-- 3. Vault Access (Investment Page) -->
+      <form name="vault-access" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+        <input type="hidden" name="bot-field" />
+        <input type="hidden" name="form-name" value="vault-access" />
+        <input type="text" name="name" />
+        <input type="email" name="email" />
+        <input type="text" name="phone" />
+        <input type="text" name="profile" />
+      </form>
+
+      <!-- 4. Talent Application (About Page) -->
+      <!-- IMPORTANTE: Añadido input type="file" para CV -->
+      <form name="talent-application" method="POST" data-netlify="true" netlify-honeypot="bot-field" enctype="multipart/form-data">
+        <input type="hidden" name="bot-field" />
+        <input type="hidden" name="form-name" value="talent-application" />
+        <input type="text" name="name" />
+        <input type="email" name="email" />
+        <input type="text" name="phone" />
+        <input type="text" name="linkedin" />
+        <textarea name="message"></textarea>
+        <input type="file" name="cv" />
+      </form>
+
+      <!-- 5. Development Brochure -->
+      <form name="development-brochure" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+        <input type="hidden" name="bot-field" />
+        <input type="hidden" name="form-name" value="development-brochure" />
+        <input type="text" name="name" />
+        <input type="email" name="email" />
+        <input type="text" name="phone" />
+        <input type="hidden" name="development-slug" />
+      </form>
+
+      <!-- 6. Development Access -->
+      <form name="development-access" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+        <input type="hidden" name="bot-field" />
+        <input type="hidden" name="form-name" value="development-access" />
+        <input type="text" name="name" />
+        <input type="email" name="email" />
+        <input type="text" name="phone" />
+        <input type="hidden" name="development-slug" />
+        <input type="checkbox" name="is-investor" />
+      </form>
+    </div>
+
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
