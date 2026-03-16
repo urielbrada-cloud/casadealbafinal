@@ -25,7 +25,8 @@ const LegalPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#f8f9fa] min-h-screen pt-32 pb-24 px-6 font-sans">
+    <div className="pt-24 md:pt-32 pb-[14px] px-[14px] min-h-screen max-w-[100vw] flex flex-col bg-background">
+      <div className="relative w-full h-full rounded-3xl md:rounded-[3rem] overflow-hidden bg-[#f8f9fa] py-8 md:py-12 px-4 md:px-12 lg:px-20 shadow-2xl font-sans">
       <div className="max-w-7xl mx-auto">
         
         {/* HEADER */}
@@ -211,6 +212,7 @@ const LegalPage: React.FC = () => {
 
             </div>
         </div>
+      </div>
       </div>
     </div>
   );

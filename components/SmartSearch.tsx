@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, SlidersHorizontal, X, ChevronDown, Check, Home, Building2, MapPin, DollarSign, Calendar, Maximize } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import Autocomplete from 'react-google-autocomplete';
 
 const PROPERTY_TYPES = [
   "Casa", "Departamento", "Terreno / Lote", "Casa en condominio", "Local comercial",
@@ -45,6 +46,13 @@ const SmartSearch: React.FC<SmartSearchProps> = ({ variant = 'hero' }) => {
   const [areaMax, setAreaMax] = useState('');
   const [age, setAge] = useState('');
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [gmapsError, setGmapsError] = useState(false);
+
+  useEffect(() => {
+    const handleGmapsError = () => setGmapsError(true);
+    window.addEventListener('gmaps-auth-failure', handleGmapsError);
+    return () => window.removeEventListener('gmaps-auth-failure', handleGmapsError);
+  }, []);
 
   // Sync state with URL params on mount
   useEffect(() => {
@@ -88,6 +96,18 @@ const SmartSearch: React.FC<SmartSearchProps> = ({ variant = 'hero' }) => {
     if (priceMin) params.append('price_min', priceMin);
     if (priceMax) params.append('price_max', priceMax);
     navigate(`/propiedades?${params.toString()}`);
+    setIsExpanded(false);
+  };
+
+  const handleMapSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const params = new URLSearchParams();
+    params.append('operation', operation);
+    if (location) params.append('location', location);
+    if (propertyType) params.append('type', propertyType);
+    if (priceMin) params.append('price_min', priceMin);
+    if (priceMax) params.append('price_max', priceMax);
+    navigate(`/mapa?${params.toString()}`);
     setIsExpanded(false);
   };
 
@@ -229,14 +249,46 @@ const SmartSearch: React.FC<SmartSearchProps> = ({ variant = 'hero' }) => {
                   className={`flex-[1.5] px-4 md:px-6 py-3 rounded-2xl md:rounded-full cursor-pointer transition-all ${activeTab === 'location' ? 'bg-gray-100 md:bg-white shadow-none md:shadow-lg' : 'hover:bg-gray-50 md:hover:bg-gray-200'}`}
                 >
                   <motion.div layoutId={`search-loc-label-${variant}`} className="text-[10px] font-bold uppercase tracking-widest text-gray-800 mb-0.5">Ubicación</motion.div>
-                  <input 
-                    type="text" 
-                    placeholder="¿Dónde buscas?" 
-                    className="bg-transparent border-none outline-none text-sm w-full text-gray-800 placeholder-gray-400 font-medium"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    autoFocus={activeTab === 'location'}
-                  />
+                  {import.meta.env.VITE_GOOGLE_MAPS_API_KEY && !gmapsError ? (
+                    <Autocomplete
+                      apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
+                      onPlaceSelected={(place) => {
+                        if (place && place.formatted_address) {
+                          setLocation(place.formatted_address);
+                        } else if (place && place.name) {
+                          setLocation(place.name);
+                        }
+                      }}
+                      options={{
+                        types: ['(regions)'],
+                        componentRestrictions: { country: 'mx' },
+                      }}
+                      defaultValue={location}
+                      onChange={(e: any) => setLocation(e.target.value)}
+                      placeholder="¿Dónde buscas?"
+                      className="bg-transparent border-none outline-none text-sm w-full text-gray-800 placeholder-gray-400 font-medium"
+                      autoFocus={activeTab === 'location'}
+                      fallback={
+                        <input 
+                          type="text" 
+                          placeholder="¿Dónde buscas?" 
+                          className="bg-transparent border-none outline-none text-sm w-full text-gray-800 placeholder-gray-400 font-medium"
+                          value={location}
+                          onChange={(e) => setLocation(e.target.value)}
+                          autoFocus={activeTab === 'location'}
+                        />
+                      }
+                    />
+                  ) : (
+                    <input 
+                      type="text" 
+                      placeholder="¿Dónde buscas?" 
+                      className="bg-transparent border-none outline-none text-sm w-full text-gray-800 placeholder-gray-400 font-medium"
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      autoFocus={activeTab === 'location'}
+                    />
+                  )}
                 </div>
 
                 <div className="hidden md:block w-[1px] h-8 bg-gray-300 mx-1"></div>
@@ -309,19 +361,23 @@ const SmartSearch: React.FC<SmartSearchProps> = ({ variant = 'hero' }) => {
 
                       {activeTab === 'location' && (
                         <div className="max-w-md mx-auto">
-                          <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4">Sugerencias</h4>
-                          <div className="space-y-2">
-                            {['Polanco', 'Lomas de Chapultepec', 'Santa Fe', 'Condesa', 'Roma Norte'].map(loc => (
-                              <button 
-                                key={loc}
-                                onClick={() => { setLocation(loc); setActiveTab('type'); }}
-                                className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-50 flex items-center gap-3 transition-colors"
-                              >
-                                <div className="bg-gray-100 p-2 rounded-lg text-gray-500"><MapPin size={18} /></div>
-                                <span className="font-medium text-gray-700">{loc}</span>
-                              </button>
-                            ))}
-                          </div>
+                          <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4">Ubicación</h4>
+                          <p className="text-sm text-gray-500 mb-6">Empieza a escribir para ver sugerencias de ubicaciones, colonias o calles.</p>
+                          
+                          {location.length === 0 && (
+                            <div 
+                              onClick={handleMapSearch}
+                              className="w-full h-32 bg-gray-100 rounded-2xl overflow-hidden relative border border-gray-200 cursor-pointer group"
+                            >
+                               <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=800&auto=format&fit=crop" alt="Map" className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" />
+                               <div className="absolute inset-0 flex items-center justify-center">
+                                  <div className="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm flex items-center gap-2 text-primary font-medium text-sm">
+                                     <MapPin size={16} />
+                                     <span>Búsqueda por mapa</span>
+                                  </div>
+                               </div>
+                            </div>
+                          )}
                         </div>
                       )}
 

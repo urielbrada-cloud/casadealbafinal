@@ -16,11 +16,12 @@ const BlogPost: React.FC = () => {
   if (!post) return <div className="pt-40 text-center">Artículo no encontrado</div>;
 
   return (
-    <div className="pt-32 pb-32 px-6 min-h-screen bg-white">
+    <div className="pt-24 md:pt-32 pb-[14px] px-[14px] min-h-screen max-w-[100vw] flex flex-col bg-background">
+      <div className="relative w-full h-full rounded-3xl md:rounded-[3rem] overflow-hidden bg-white py-8 md:py-12 px-4 md:px-12 lg:px-20 shadow-2xl">
       <div className="max-w-4xl mx-auto">
         
         {/* Navigation Bar */}
-        <div className="flex justify-between items-center mb-16">
+        <div className="flex justify-between items-center mb-8 md:mb-16">
             <Link to="/journal" className="inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-primary transition-colors group">
                <div className="p-2 rounded-full border border-gray-200 group-hover:border-primary transition-colors">
                  <ArrowLeft size={14} />
@@ -125,13 +126,14 @@ const BlogPost: React.FC = () => {
                     <Link to="/inversion" className="bg-white text-primary px-10 py-5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-accent hover:text-white transition-all duration-300 shadow-lg transform hover:-translate-y-1">
                         Ver Oportunidades
                     </Link>
-                    <a href="https://wa.me/523322275000" target="_blank" rel="noopener noreferrer" className="border border-white/30 text-white px-10 py-5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-white/10 transition-all duration-300">
+                    <a href={`https://wa.me/523322275000?text=${encodeURIComponent("Hola me interesa contactar a un asesor sobre las oportunidades de inversión del artículo: " + post.title)}`} target="_blank" rel="noopener noreferrer" className="border border-white/30 text-white px-10 py-5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-white/10 transition-all duration-300">
                         Contactar Asesor
                     </a>
                 </div>
             </div>
         </div>
 
+      </div>
       </div>
     </div>
   );

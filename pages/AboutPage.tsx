@@ -1,64 +1,20 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { TEAM } from '../data/mockData';
-import { submitContactForm } from '../services/contact';
-import { Quote, Star, ArrowRight, X, Upload, Send, Linkedin, CheckCircle2, Loader2, FileText } from 'lucide-react';
+import { Quote, Star, ArrowRight } from 'lucide-react';
 
 const AboutPage: React.FC = () => {
-  const [showTalentForm, setShowTalentForm] = useState(false);
-  const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
-  const [fileName, setFileName] = useState<string>('');
-
-  // Prevent scroll when modal is open
-  React.useEffect(() => {
-    if (showTalentForm) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => { document.body.style.overflow = 'unset'; };
-  }, [showTalentForm]);
-
-  // Reset form when modal closes
-  React.useEffect(() => {
-      if (!showTalentForm) {
-          setTimeout(() => {
-              setFormStatus('idle');
-              setFileName('');
-          }, 300);
-      }
-  }, [showTalentForm]);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files && e.target.files.length > 0) {
-          setFileName(e.target.files[0].name);
-      }
-  };
-
-  const handleTalentSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setFormStatus('submitting');
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    
-    try {
-      await submitContactForm(formData, 'talent-application');
-      setFormStatus('success');
-    } catch (error) {
-      alert("Error al enviar postulación.");
-      setFormStatus('idle');
-    }
-  };
 
   return (
-    <div className="bg-[#dfdfdf] min-h-screen font-sans text-primary selection:bg-accent selection:text-white">
+    <div className="pt-24 md:pt-32 pb-[14px] px-[14px] min-h-screen max-w-[100vw] flex flex-col bg-background">
+      <div className="relative w-full h-full rounded-3xl md:rounded-[3rem] overflow-hidden bg-white py-8 md:py-12 px-0 md:px-0 lg:px-0 shadow-2xl">
       
       {/* 1. HERO - Editorial Typography & Architecture */}
-      <section className="pt-40 pb-20 px-6 max-w-[1920px] mx-auto">
+      <section className="pt-20 md:pt-40 pb-12 md:pb-20 px-4 md:px-6 max-w-[1920px] mx-auto">
          <div className="max-w-7xl mx-auto">
-            <div className="border-b border-primary/10 pb-12 mb-16 animate-fadeIn">
-                <span className="block text-accent text-xs font-bold uppercase tracking-[0.3em] mb-6">Nuestra Esencia</span>
-                <h1 className="font-serif text-6xl md:text-8xl lg:text-[7.5rem] leading-[0.9] tracking-tighter text-primary">
+            <div className="border-b border-primary/10 pb-8 md:pb-12 mb-12 md:mb-16 animate-fadeIn">
+                <span className="block text-accent text-xs font-bold uppercase tracking-[0.3em] mb-4 md:mb-6">Nuestra Esencia</span>
+                <h1 className="font-serif text-5xl md:text-8xl lg:text-[7.5rem] leading-[0.9] tracking-tighter text-primary">
                    El arte de <br/>
                    <span className="italic font-light text-gray-500 font-serif">vivir bien.</span>
                 </h1>
@@ -173,7 +129,10 @@ const AboutPage: React.FC = () => {
                 <h2 className="font-serif text-5xl text-primary">Mentes Maestras</h2>
             </div>
             <button 
-                onClick={() => setShowTalentForm(true)}
+                onClick={() => {
+                    const message = `Hola me interesa unirme al equipo de Casa de Alba`;
+                    window.open(`https://wa.me/523322275000?text=${encodeURIComponent(message)}`, '_blank');
+                }}
                 className="hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors mt-8 md:mt-0"
             >
                Unirse al equipo <ArrowRight size={14}/>
@@ -205,7 +164,10 @@ const AboutPage: React.FC = () => {
              
              {/* Hiring Card Minimal - TRIGGER FORM */}
              <div 
-                onClick={() => setShowTalentForm(true)}
+                onClick={() => {
+                    const message = `Hola me interesa unirme al equipo de Casa de Alba`;
+                    window.open(`https://wa.me/523322275000?text=${encodeURIComponent(message)}`, '_blank');
+                }}
                 className="w-full aspect-[3/4] bg-white border border-dashed border-gray-300 flex flex-col items-center justify-center p-8 text-center hover:border-accent hover:bg-white transition-all duration-300 cursor-pointer group"
              >
                   <h3 className="font-serif text-2xl mb-3 text-primary">¿Eres excepcional?</h3>
@@ -216,7 +178,10 @@ const AboutPage: React.FC = () => {
          
          <div className="md:hidden mt-12 text-center">
             <button 
-                onClick={() => setShowTalentForm(true)}
+                onClick={() => {
+                    const message = `Hola me interesa unirme al equipo de Casa de Alba`;
+                    window.open(`https://wa.me/523322275000?text=${encodeURIComponent(message)}`, '_blank');
+                }}
                 className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors"
             >
                Unirse al equipo <ArrowRight size={14}/>
@@ -244,137 +209,9 @@ const AboutPage: React.FC = () => {
          </div>
       </section>
 
-      {/* --- TALENT APPLICATION MODAL --- */}
-      {showTalentForm && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            {/* Backdrop with Blur */}
-            <div 
-                className="absolute inset-0 bg-[#0B1120]/80 backdrop-blur-sm transition-opacity" 
-                onClick={() => setShowTalentForm(false)}
-            ></div>
 
-            {/* Modal Content */}
-            <div className="bg-white w-full max-w-lg rounded-3xl p-8 md:p-12 relative z-10 animate-fadeInUp shadow-2xl border border-white/50 overflow-y-auto max-h-[90vh]">
-                <button 
-                    onClick={() => setShowTalentForm(false)} 
-                    className="absolute top-6 right-6 p-2 bg-gray-50 rounded-full text-gray-400 hover:text-primary transition-colors"
-                >
-                    <X size={20}/>
-                </button>
-                
-                {formStatus === 'success' ? (
-                    <div className="text-center py-12 animate-fadeIn">
-                        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-green-600 mx-auto mb-6">
-                            <CheckCircle2 size={40} />
-                        </div>
-                        <h3 className="font-serif text-3xl text-primary mb-4">¡Postulación Recibida!</h3>
-                        <p className="text-gray-500 mb-8 max-w-xs mx-auto leading-relaxed">
-                            Agradecemos tu interés en formar parte de nuestro equipo. Analizaremos tu perfil y te contactaremos si eres seleccionado.
-                        </p>
-                        <button 
-                            onClick={() => setShowTalentForm(false)}
-                            className="bg-primary text-white px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-accent transition-colors"
-                        >
-                            Cerrar Ventana
-                        </button>
-                    </div>
-                ) : (
-                    <>
-                        <span className="text-accent text-[10px] font-bold uppercase tracking-widest mb-2 block">
-                            Talento Excepcional
-                        </span>
-                        <h3 className="font-serif text-3xl md:text-4xl mb-4 text-primary tracking-tight">
-                            Únete a la Firma
-                        </h3>
-                        <p className="text-sm text-gray-500 mb-8 font-light leading-relaxed">
-                            Buscamos perfiles con ambición, ética intachable y visión global. Si crees que tienes lo necesario para redefinir el lujo inmobiliario, queremos conocerte.
-                        </p>
-                        
-                        <form 
-                            name="talent-application" 
-                            method="POST" 
-                            data-netlify="true" 
-                            className="space-y-6"
-                            onSubmit={handleTalentSubmit}
-                        >
-                            <input type="hidden" name="form-name" value="talent-application" />
-                            <input type="hidden" name="bot-field" />
 
-                            <div className="space-y-8">
-                                <div className="relative group">
-                                    <input type="text" name="name" required disabled={formStatus === 'submitting'} className="peer w-full border-b border-gray-200 py-3 outline-none focus:border-accent bg-transparent placeholder-transparent transition-colors text-primary font-medium disabled:opacity-50" id="fullName" placeholder="Nombre" />
-                                    <label htmlFor="fullName" className="absolute left-0 -top-3.5 text-xs text-gray-400 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-accent font-bold uppercase tracking-widest">Nombre Completo</label>
-                                </div>
-                                
-                                <div className="relative group">
-                                    <input type="email" name="email" required disabled={formStatus === 'submitting'} className="peer w-full border-b border-gray-200 py-3 outline-none focus:border-accent bg-transparent placeholder-transparent transition-colors text-primary font-medium disabled:opacity-50" id="emailApply" placeholder="Email" />
-                                    <label htmlFor="emailApply" className="absolute left-0 -top-3.5 text-xs text-gray-400 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-accent font-bold uppercase tracking-widest">Correo Electrónico</label>
-                                </div>
-                                
-                                <div className="relative group">
-                                    <input type="tel" name="phone" required disabled={formStatus === 'submitting'} className="peer w-full border-b border-gray-200 py-3 outline-none focus:border-accent bg-transparent placeholder-transparent transition-colors text-primary font-medium disabled:opacity-50" id="phoneApply" placeholder="Phone" />
-                                    <label htmlFor="phoneApply" className="absolute left-0 -top-3.5 text-xs text-gray-400 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-accent font-bold uppercase tracking-widest">Celular / WhatsApp</label>
-                                </div>
-
-                                <div className="relative group">
-                                    <input type="url" name="linkedin" disabled={formStatus === 'submitting'} className="peer w-full border-b border-gray-200 py-3 outline-none focus:border-accent bg-transparent placeholder-transparent transition-colors text-primary font-medium pl-6 disabled:opacity-50" id="linkedin" placeholder="LinkedIn" />
-                                    <Linkedin size={16} className="absolute left-0 top-3.5 text-gray-400 peer-focus:text-accent transition-colors"/>
-                                    <label htmlFor="linkedin" className="absolute left-6 -top-3.5 text-xs text-gray-400 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-accent font-bold uppercase tracking-widest">Perfil de LinkedIn (URL)</label>
-                                </div>
-
-                                <div className="relative group">
-                                    <textarea name="message" rows={3} disabled={formStatus === 'submitting'} className="peer w-full border-b border-gray-200 py-3 outline-none focus:border-accent bg-transparent placeholder-transparent transition-colors text-primary font-medium resize-none disabled:opacity-50" id="motive" placeholder="Motivo"></textarea>
-                                    <label htmlFor="motive" className="absolute left-0 -top-3.5 text-xs text-gray-400 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-accent font-bold uppercase tracking-widest">Carta de Motivos (Breve)</label>
-                                </div>
-
-                                {/* File Upload Simulation */}
-                                <div className={`border border-dashed ${fileName ? 'border-accent bg-accent/5' : 'border-gray-300'} rounded-xl p-6 text-center hover:bg-gray-50 transition-colors cursor-pointer group/upload relative`}>
-                                    <input 
-                                        type="file" 
-                                        name="cv" 
-                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
-                                        accept=".pdf,.doc,.docx" 
-                                        onChange={handleFileChange}
-                                        disabled={formStatus === 'submitting'}
-                                    />
-                                    {fileName ? (
-                                        <div className="flex flex-col items-center">
-                                            <FileText className="text-accent mb-2" size={24}/>
-                                            <p className="text-xs text-primary font-bold">{fileName}</p>
-                                            <p className="text-[10px] text-gray-400 mt-1">Clic para cambiar archivo</p>
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <Upload className="mx-auto text-gray-400 group-hover/upload:text-accent mb-2 transition-colors" size={24}/>
-                                            <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">Adjuntar CV (PDF)</p>
-                                            <p className="text-[10px] text-gray-400 mt-1">Máx. 5MB</p>
-                                        </>
-                                    )}
-                                </div>
-                            </div>
-                            
-                            <button 
-                                type="submit" 
-                                disabled={formStatus === 'submitting'}
-                                className="w-full bg-primary text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-accent transition-colors shadow-lg mt-8 flex items-center justify-center gap-2 group/btn disabled:opacity-70"
-                            >
-                                {formStatus === 'submitting' ? (
-                                    <>Enviando <Loader2 size={16} className="animate-spin"/></>
-                                ) : (
-                                    <>Enviar Postulación <Send size={14} className="group-hover/btn:translate-x-1 transition-transform"/></>
-                                )}
-                            </button>
-                            
-                            <p className="text-[10px] text-center text-gray-400 mt-4">
-                                Tus datos serán tratados con estricta confidencialidad por nuestro comité de talento.
-                            </p>
-                        </form>
-                    </>
-                )}
-            </div>
-        </div>
-      )}
-
+      </div>
     </div>
   );
 };

@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { DEVELOPMENTS } from '../data/mockData';
-import { submitContactForm } from '../services/contact';
 import { 
   ArrowLeft, MapPin, Download, 
   CheckCircle2, Star, ArrowRight, MessageCircle, 
@@ -15,10 +14,6 @@ const DevelopmentDetail: React.FC = () => {
   
   // Tabs State
   const [activeTab, setActiveTab] = useState<'concept' | 'amenities' | 'units'>('concept');
-  
-  // Modal State
-  const [showBrochureModal, setShowBrochureModal] = useState(false);
-  const [brochureStep, setBrochureStep] = useState<'form' | 'download'>('form');
   
   // Gallery Lightbox State
   const [showGallery, setShowGallery] = useState(false);
@@ -89,30 +84,6 @@ const DevelopmentDetail: React.FC = () => {
       window.open(`https://wa.me/523322275000?text=${text}`, '_blank');
   };
 
-  const handleBrochureSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      const formData = new FormData(e.currentTarget);
-      
-      try {
-        await submitContactForm(formData, 'development-brochure');
-        setBrochureStep('download');
-      } catch (error) {
-        alert("Error al enviar solicitud.");
-      }
-  };
-
-  const handleAccessRequestSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      const formData = new FormData(e.currentTarget);
-      
-      try {
-        await submitContactForm(formData, 'development-access');
-        alert("Solicitud recibida. Un asesor le contactará en breve.");
-      } catch (error) {
-        alert("Error al enviar solicitud.");
-      }
-  };
-
   // --- LIGHTBOX LOGIC ---
   const openLightbox = (index: number) => {
     setLightboxIndex(index);
@@ -128,7 +99,8 @@ const DevelopmentDetail: React.FC = () => {
   };
 
   return (
-    <div className="bg-white min-h-screen font-sans">
+    <div className="pt-32 pb-[14px] px-[14px] min-h-screen max-w-[100vw] flex flex-col bg-background">
+      <div className="relative w-full h-full rounded-[2.5rem] md:rounded-[3rem] overflow-hidden bg-white py-0 px-0 shadow-2xl font-sans">
 
       {/* 1. IMMERSIVE HERO SECTION (WITH SLIDER) */}
       <section className="relative h-screen w-full overflow-hidden">
@@ -149,7 +121,7 @@ const DevelopmentDetail: React.FC = () => {
         ))}
 
         {/* Navigation Overlay */}
-        <div className="absolute top-24 left-0 w-full px-6 md:px-12 z-20 flex justify-between items-center">
+        <div className="absolute top-20 md:top-24 left-0 w-full px-4 md:px-12 z-20 flex justify-between items-center">
             <Link to="/desarrollos" className="text-white/80 hover:text-white flex items-center gap-2 text-xs font-bold uppercase tracking-widest backdrop-blur-md bg-white/10 px-4 py-2 rounded-full transition-colors">
                 <ArrowLeft size={14} /> Volver
             </Link>
@@ -159,9 +131,9 @@ const DevelopmentDetail: React.FC = () => {
         </div>
 
         {/* Hero Content */}
-        <div className="absolute bottom-0 left-0 w-full px-6 md:px-12 pb-12 md:pb-24 z-20">
+        <div className="absolute bottom-0 left-0 w-full px-4 md:px-12 pb-8 md:pb-24 z-20">
             <div className="max-w-5xl">
-                <div className="mb-6 flex flex-wrap gap-4 animate-fadeInUp">
+                <div className="mb-4 md:mb-6 flex flex-wrap gap-2 md:gap-4 animate-fadeInUp">
                     <span className="bg-accent text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md">
                         Entrega: {development.completionDate}
                     </span>
@@ -170,17 +142,17 @@ const DevelopmentDetail: React.FC = () => {
                     </span>
                 </div>
                 
-                <h1 className="font-serif text-5xl md:text-7xl lg:text-9xl text-white leading-none mb-6 tracking-tight animate-fadeInUp delay-100">
+                <h1 className="font-serif text-4xl md:text-7xl lg:text-9xl text-white leading-none mb-4 md:mb-6 tracking-tight animate-fadeInUp delay-100">
                     {development.name}
                 </h1>
                 
-                <p className="font-serif text-xl md:text-3xl text-white/90 italic max-w-2xl mb-12 animate-fadeInUp delay-200">
+                <p className="font-serif text-lg md:text-3xl text-white/90 italic max-w-2xl mb-8 md:mb-12 animate-fadeInUp delay-200">
                     "{development.tagline}"
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 animate-fadeInUp delay-300">
                     <button 
-                        onClick={() => { setBrochureStep('form'); setShowBrochureModal(true); }}
+                        onClick={() => handleWhatsApp(`Hola me interesa descargar el brochure del desarrollo ${development.name}`)}
                         className="bg-white text-primary px-8 py-4 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-accent hover:text-white transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.2)] flex items-center justify-center gap-3"
                     >
                         <Download size={16} /> Descargar Brochure
@@ -500,29 +472,15 @@ const DevelopmentDetail: React.FC = () => {
 
                   <div className="md:w-1/2 w-full bg-white rounded-3xl p-8 shadow-2xl">
                       <h3 className="font-serif text-2xl text-primary mb-6">Solicitar Acceso</h3>
-                      <form 
-                        name="development-access" 
-                        method="POST" 
-                        data-netlify="true" 
-                        className="space-y-4"
-                        onSubmit={handleAccessRequestSubmit}
+                      <p className="text-gray-500 mb-6 text-sm">
+                          Contáctanos por WhatsApp para registrar tu interés y asegurar tu lugar en la lista cero.
+                      </p>
+                      <button 
+                          onClick={() => handleWhatsApp(`Hola me interesa registrarme como early access para el desarrollo ${development.name}`)}
+                          className="w-full bg-primary text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-accent transition-colors shadow-lg flex items-center justify-center gap-2"
                       >
-                          <input type="hidden" name="form-name" value="development-access" />
-                          <input type="hidden" name="development-slug" value={slug} />
-                          
-                          <input type="text" name="name" required placeholder="Nombre Completo" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-primary placeholder-gray-400" />
-                          <input type="email" name="email" required placeholder="Correo Electrónico" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-primary placeholder-gray-400" />
-                          <input type="tel" name="phone" required placeholder="WhatsApp / Celular" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-primary placeholder-gray-400" />
-                          
-                          <div className="flex gap-2 pt-2">
-                             <input type="checkbox" name="is-investor" id="investor" className="mt-1" />
-                             <label htmlFor="investor" className="text-xs text-gray-500">Soy inversionista interesado en múltiples unidades.</label>
-                          </div>
-
-                          <button type="submit" className="w-full bg-primary text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-accent transition-colors shadow-lg mt-4 flex items-center justify-center gap-2">
-                              Registrar Interés <ArrowRight size={14} />
-                          </button>
-                      </form>
+                          <MessageCircle size={16} /> Contactar por WhatsApp
+                      </button>
                   </div>
               </div>
           </div>
@@ -549,65 +507,9 @@ const DevelopmentDetail: React.FC = () => {
           </div>
       )}
 
-      {/* BROCHURE MODAL */}
-      {showBrochureModal && (
-          <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
-              <div className="bg-white rounded-3xl p-10 max-w-md w-full relative animate-fadeInUp">
-                  <button onClick={() => setShowBrochureModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-primary">
-                      <X size={20} />
-                  </button>
-                  
-                  {brochureStep === 'form' ? (
-                      <>
-                        <div className="text-center mb-6">
-                            <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center text-accent mx-auto mb-4">
-                                <Download size={32} />
-                            </div>
-                            <h3 className="font-serif text-2xl text-primary mb-2">Descargar Brochure Oficial</h3>
-                            <p className="text-xs text-gray-500">Por favor complete sus datos para recibir el enlace de descarga directa.</p>
-                        </div>
-                        <form 
-                            name="development-brochure" 
-                            method="POST" 
-                            data-netlify="true" 
-                            className="space-y-4"
-                            onSubmit={handleBrochureSubmit}
-                        >
-                            <input type="hidden" name="form-name" value="development-brochure" />
-                            <input type="hidden" name="development-slug" value={slug} />
 
-                            <input type="text" name="name" required placeholder="Nombre Completo" className="w-full bg-gray-50 p-3 rounded-xl border border-gray-200 outline-none focus:border-accent text-sm" />
-                            <input type="email" name="email" required placeholder="Correo Electrónico" className="w-full bg-gray-50 p-3 rounded-xl border border-gray-200 outline-none focus:border-accent text-sm" />
-                            <input type="tel" name="phone" required placeholder="WhatsApp" className="w-full bg-gray-50 p-3 rounded-xl border border-gray-200 outline-none focus:border-accent text-sm" />
-                            <button type="submit" className="w-full bg-primary text-white py-3 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-accent transition-colors">
-                                Obtener Brochure
-                            </button>
-                        </form>
-                      </>
-                  ) : (
-                      <div className="text-center py-8">
-                          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600 mx-auto mb-4 animate-bounce">
-                              <FileDown size={32} />
-                          </div>
-                          <h3 className="font-serif text-2xl text-primary mb-4">¡Listo!</h3>
-                          <p className="text-sm text-gray-500 mb-8">Su descarga está lista. Haga clic abajo para ver el archivo.</p>
-                          <a 
-                            href="https://drive.google.com/" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 bg-accent text-white px-8 py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-primary transition-colors"
-                          >
-                              <Download size={16} /> Descargar PDF Ahora
-                          </a>
-                          <button onClick={() => setShowBrochureModal(false)} className="block w-full text-center mt-6 text-gray-400 text-xs hover:text-primary underline">
-                              Cerrar ventana
-                          </button>
-                      </div>
-                  )}
-              </div>
-          </div>
-      )}
 
+      </div>
     </div>
   );
 };

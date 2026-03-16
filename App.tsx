@@ -17,6 +17,7 @@ const AboutPage = React.lazy(() => import('./pages/AboutPage'));
 const ServicesPage = React.lazy(() => import('./pages/ServicesPage'));
 const AdminPage = React.lazy(() => import('./pages/AdminPage'));
 const LegalPage = React.lazy(() => import('./pages/LegalPage'));
+const MapSearchPage = React.lazy(() => import('./pages/MapSearchPage'));
 
 // Simple loading fallback
 const PageLoader = () => (
@@ -40,6 +41,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/propiedades" element={<SearchResults />} />
+                  <Route path="/mapa" element={<MapSearchPage />} />
                   <Route path="/propiedades/:slug" element={<PropertyDetail />} />
                   <Route path="/desarrollos" element={<DevelopmentsView />} />
                   <Route path="/desarrollos/:slug" element={<DevelopmentDetail />} /> 

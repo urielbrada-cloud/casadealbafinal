@@ -278,6 +278,78 @@ const INITIAL_PROPERTIES: Property[] = [
       { name: 'Club de Industriales', distance: '5 min', category: 'office' },
       { name: 'Bosque Colomos', distance: '10 min', category: 'tourism' }
     ]
+  },
+  {
+    id: 'prop-cdmx-polanco-001',
+    slug: 'penthouse-polanco-cdmx',
+    title: 'Penthouse de Lujo en Polanco',
+    location: 'Polanco, Ciudad de México',
+    price: '$25,000,000 MXN',
+    priceRaw: 25000000,
+    type: 'residential',
+    bedrooms: 3,
+    bathrooms: 3.5,
+    parking: 3,
+    landArea: 'N/A',
+    constructionArea: '320 m²',
+    isFeatured: true,
+    description: `Espectacular Penthouse en el corazón de Polanco con vistas al Parque Lincoln. Acabados de importación, pisos de madera de roble, y una terraza privada de 80m2.`,
+    features: ['Seguridad 24/7', 'Terraza Privada', 'Elevador Directo', 'Cuarto de Servicio'],
+    images: [
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1600607687931-cebf004f96eb?q=80&w=800&auto=format&fit=crop'
+    ],
+    coordinates: { lat: 19.4326, lng: -99.1932 },
+    googleMapsUrl: 'https://maps.app.goo.gl/Q51TaGkid7r76uFL8',
+    pointsOfInterest: []
+  },
+  {
+    id: 'prop-mty-sanpedro-001',
+    slug: 'residencia-san-pedro-garza-garcia',
+    title: 'Residencia en San Pedro Garza García',
+    location: 'San Pedro Garza García, Monterrey',
+    price: '$35,500,000 MXN',
+    priceRaw: 35500000,
+    type: 'residential',
+    bedrooms: 4,
+    bathrooms: 5,
+    parking: 4,
+    landArea: '600 m²',
+    constructionArea: '550 m²',
+    isFeatured: true,
+    description: `Majestuosa residencia con vistas a la Sierra Madre. Diseño arquitectónico contemporáneo, alberca infinita y jardín paisajista.`,
+    features: ['Alberca Infinita', 'Vistas a la Montaña', 'Cine en Casa', 'Jardín Paisajista'],
+    images: [
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?q=80&w=800&auto=format&fit=crop'
+    ],
+    coordinates: { lat: 25.6511, lng: -100.3585 },
+    googleMapsUrl: 'https://maps.app.goo.gl/Q51TaGkid7r76uFL8',
+    pointsOfInterest: []
+  },
+  {
+    id: 'prop-tulum-aldeazama-001',
+    slug: 'villa-aldea-zama-tulum',
+    title: 'Villa Exclusiva en Aldea Zama',
+    location: 'Aldea Zama, Tulum',
+    price: '$12,000,000 MXN',
+    priceRaw: 12000000,
+    type: 'residential',
+    bedrooms: 3,
+    bathrooms: 3,
+    parking: 2,
+    landArea: '300 m²',
+    constructionArea: '250 m²',
+    isFeatured: true,
+    description: `Villa rodeada de selva en la zona más exclusiva de Tulum. Diseño eco-chic, alberca privada y paneles solares. A 10 minutos de la playa.`,
+    features: ['Alberca Privada', 'Eco-Chic', 'Paneles Solares', 'Seguridad 24/7'],
+    images: [
+      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=800&auto=format&fit=crop'
+    ],
+    coordinates: { lat: 20.2014, lng: -87.4554 },
+    googleMapsUrl: 'https://maps.app.goo.gl/Q51TaGkid7r76uFL8',
+    pointsOfInterest: []
   }
 ];
 
@@ -344,9 +416,32 @@ const loadProperties = (): Property[] => {
   }
 };
 
+const addFallbackCoordinates = (p: Property, index: number): Property => {
+  if (p.coordinates && p.coordinates.lat && p.coordinates.lng) {
+    return p;
+  }
+  
+  // Fallback coordinates for mock data (Guadalajara/Zapopan area)
+  const baseLat = 20.6736;
+  const baseLng = -103.3440;
+  
+  // Generate a deterministic offset based on the property ID or index
+  const idNum = parseInt(p.id.replace(/\D/g, '')) || index;
+  const latOffset = ((idNum % 100) - 50) / 1000;
+  const lngOffset = (((idNum * 7) % 100) - 50) / 1000;
+  
+  return {
+    ...p,
+    coordinates: {
+      lat: baseLat + latOffset,
+      lng: baseLng + lngOffset
+    }
+  };
+};
+
 // Exported getter that components should use
 export const getProperties = (): Property[] => {
-  return loadProperties();
+  return loadProperties().map(addFallbackCoordinates);
 };
 
 // Exported setter for the Admin Panel

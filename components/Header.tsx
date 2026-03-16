@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, MessageCircle } from 'lucide-react';
+import { Menu, X, MessageCircle, Search } from 'lucide-react';
 import Logo from './Logo';
+import LogoMobile from './LogoMobile';
 import SmartSearch from './SmartSearch';
 
 const Header: React.FC = () => {
@@ -35,16 +36,16 @@ const Header: React.FC = () => {
 
   // Header Styling Logic
   const getHeaderClass = () => {
-    const base = "fixed top-0 left-0 right-0 z-40 transition-all duration-500 px-4 md:px-6 lg:px-12 flex items-center justify-between";
+    const base = "fixed top-0 left-0 right-0 z-40 transition-all duration-500 pl-[16px] pr-4 md:px-6 lg:px-12 flex items-center justify-between h-[52px] md:h-auto";
     
     if (isHomePage) {
       return isScrolled 
-        ? `${base} py-3 bg-white/95 backdrop-blur-md shadow-sm text-primary`
-        : `${base} pt-8 pb-4 md:pt-10 md:pb-6 bg-transparent`;
+        ? `${base} py-0 md:py-3 bg-white/95 backdrop-blur-md shadow-sm text-primary`
+        : `${base} py-0 md:pt-8 md:pb-6 bg-transparent`;
     }
     
     // Non-home pages
-    return `${base} py-3 bg-white/95 backdrop-blur-md shadow-sm text-primary`;
+    return `${base} py-0 md:py-3 bg-white/95 backdrop-blur-md shadow-sm text-primary`;
   };
 
   const linkBaseClass = `text-[11px] font-bold uppercase tracking-widest transition-colors flex items-center gap-1 whitespace-nowrap ${
@@ -58,49 +59,45 @@ const Header: React.FC = () => {
     <>
       <header className={getHeaderClass()}>
         
-        {/* GRUPO IZQUIERDO: LOGO + BUSCADOR */}
-        <div className="flex items-center gap-4 lg:gap-8 shrink-0">
+        {/* GRUPO IZQUIERDO: LOGO */}
+        <div className="flex items-center shrink-0">
           <Link 
             to="/" 
-            className="z-50 group shrink-0 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:static md:transform-none pt-0 -mt-[18px] mb-[6px] ml-0"
+            className="z-50 group shrink-0 flex items-center"
           >
-            <Logo className={`h-[62px] w-[177px] ml-[78px] mt-[16px] pl-0 transition-colors duration-300 ${isTransparent ? 'text-white drop-shadow-md group-hover:opacity-80' : 'text-primary group-hover:text-accent'}`} />
+            <Logo className={`hidden md:block h-[48px] w-auto transition-colors duration-300 ${isTransparent ? 'text-white drop-shadow-md group-hover:opacity-80' : 'text-primary group-hover:text-accent'}`} />
+            <LogoMobile className={`md:hidden w-[47px] h-[57px] transition-all duration-300 ${isTransparent ? 'text-white drop-shadow-md group-hover:opacity-80 ml-[6px] mt-[40px] mb-[1px]' : 'text-primary group-hover:text-accent -mt-[4px] -ml-[5px] mb-[1px]'}`} />
           </Link>
           
-          {/* SEARCH BAR - COMPACT NEXT TO LOGO */}
-          {/* Transition wrapper to slide/fade it in */}
+          {/* SEARCH BAR - COMPACT NEXT TO LOGO (DESKTOP ONLY) */}
           <div className={`
               hidden md:block transition-all duration-500 ease-in-out transform origin-left
               ${showHeaderSearch 
-                ? 'w-[320px] opacity-100 translate-x-0 scale-100 pointer-events-auto ml-2' 
+                ? 'w-[320px] opacity-100 translate-x-0 scale-100 pointer-events-auto ml-6' 
                 : 'w-0 opacity-0 -translate-x-4 scale-95 pointer-events-none overflow-hidden ml-0'}
           `}>
             <SmartSearch variant="header" />
           </div>
         </div>
 
-        {/* GRUPO DERECHO: MENÚ DE NAVEGACIÓN + ACCIONES */}
-        <div className="flex items-center gap-6 lg:gap-8 shrink-0">
+        {/* GRUPO DERECHO: ACCIONES Y MENÚ */}
+        <div className="flex items-center gap-2 md:gap-6 lg:gap-8 shrink-0">
           
           {/* Desktop Nav - Dropdown Menu */}
           <div 
-            className="hidden xl:block relative"
+            className="hidden xl:flex items-center relative"
             onMouseEnter={() => setIsDesktopMenuOpen(true)}
             onMouseLeave={() => setIsDesktopMenuOpen(false)}
           >
-            <button className={`${linkBaseClass} py-2 flex items-center gap-2`}>
-              Explorar
-            </button>
-            
-            {/* Dropdown Content */}
+            {/* Dropdown Content (Deploys to the left) */}
             <div className={`
-              absolute top-full right-0 pt-4
-              transition-all duration-500 ease-in-out transform origin-top-right
+              absolute right-full top-1/2 -translate-y-1/2 pr-6
+              transition-all duration-500 ease-in-out transform origin-right
               ${isDesktopMenuOpen 
-                ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' 
-                : 'opacity-0 -translate-y-4 scale-95 pointer-events-none'}
+                ? 'opacity-100 translate-x-0 scale-100 pointer-events-auto' 
+                : 'opacity-0 translate-x-8 scale-95 pointer-events-none'}
             `}>
-              <div className="bg-white/95 backdrop-blur-md shadow-xl rounded-2xl py-6 px-8 min-w-[220px] flex flex-col gap-5 border border-gray-100">
+              <div className="bg-white/95 backdrop-blur-md shadow-xl rounded-full py-3 px-8 flex flex-row gap-6 border border-gray-100 items-center whitespace-nowrap">
                 <Link to="/propiedades" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Propiedades</Link>
                 <Link to="/desarrollos" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Desarrollos</Link>
                 <Link to="/servicios" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Servicios</Link>
@@ -108,37 +105,48 @@ const Header: React.FC = () => {
                 <Link to="/nosotros" onClick={() => setIsDesktopMenuOpen(false)} className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">Nosotros</Link>
               </div>
             </div>
+
+            <button className={`${linkBaseClass} py-2 hidden md:flex items-center gap-2 relative z-10`}>
+              Explorar
+            </button>
           </div>
           
           {/* Action Buttons */}
-          <div className="flex items-center gap-4">
+          <div className={`flex items-center gap-1 md:gap-4 transition-all duration-300 ${isTransparent ? 'ml-[4px] mr-[13px] -mb-[38px]' : ''}`}>
+            
+            {/* WhatsApp Button (Mobile Icon / Desktop Full) */}
             <a 
               href="https://wa.me/523322275000" 
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden md:flex bg-[#25D366] text-white px-5 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-[#128C7E] transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 items-center gap-2 whitespace-nowrap"
+              className={`flex items-center justify-center transition-all duration-300 ${
+                isTransparent && !isMobileMenuOpen ? 'text-white drop-shadow-md hover:opacity-80' : 'text-[#25D366] hover:opacity-80'
+              } md:bg-[#25D366] md:text-white md:px-5 md:py-2.5 md:rounded-full md:text-[10px] md:font-bold md:uppercase md:tracking-widest md:hover:bg-[#128C7E] md:shadow-lg md:hover:shadow-xl md:hover:-translate-y-0.5 md:gap-2 w-10 h-10 md:w-auto md:h-auto rounded-full`}
+              aria-label="WhatsApp"
             >
-              <MessageCircle size={16} fill="currentColor" />
-              WhatsApp
+              <MessageCircle size={20} fill="currentColor" className="md:w-4 md:h-4" />
+              <span className="hidden md:inline">WhatsApp</span>
             </a>
 
             {/* Mobile Menu Button */}
             <button 
-              className={`xl:hidden relative z-50 focus:outline-none p-2 transition-colors ${
-                isTransparent && !isMobileMenuOpen ? 'text-white drop-shadow-md hover:opacity-80' : 'text-primary hover:text-accent'
+              className={`relative z-50 focus:outline-none p-2 flex items-center justify-center w-10 h-10 rounded-full transition-colors ${
+                isTransparent && !isMobileMenuOpen ? 'text-white drop-shadow-md hover:bg-white/20' : 'text-primary hover:bg-gray-100'
               } ${isMobileMenuOpen ? '!text-primary' : ''}`}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Menú"
             >
+              <span className="text-[11px] font-bold uppercase tracking-widest hidden xl:block mr-2">Explorar</span>
               {isMobileMenuOpen ? <X size={24} strokeWidth={2} /> : <Menu size={24} strokeWidth={2} />}
             </button>
           </div>
         </div>
       </header>
 
-      {/* Mobile Menu Overlay - Full Screen Fixed */}
+      {/* Mobile Menu Overlay - Full Screen Fixed (Deploys downwards) */}
       <div 
-        className={`fixed inset-0 z-[60] bg-white transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1) xl:hidden flex flex-col ${
-          isMobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'
+        className={`fixed inset-0 z-[60] bg-white transition-all duration-500 ease-in-out xl:hidden flex flex-col ${
+          isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
         }`}
       >
         {/* Mobile Header for Close Button alignment */}

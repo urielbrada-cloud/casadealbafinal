@@ -5,28 +5,29 @@ import { Link } from 'react-router-dom';
 
 const ServicesPage: React.FC = () => {
   return (
-    <div className="bg-[#f8f9fa] min-h-screen pt-32 pb-24 px-4 md:px-8">
+    <div className="pt-24 md:pt-32 pb-[14px] px-[14px] min-h-screen max-w-[100vw] flex flex-col bg-background">
+      <div className="relative w-full h-full rounded-3xl md:rounded-[3rem] overflow-hidden bg-[#f8f9fa] py-8 md:py-12 px-4 md:px-12 lg:px-20 shadow-2xl">
       
       {/* HERO SECTION */}
-      <div className="max-w-7xl mx-auto mb-20 text-center md:text-left">
+      <div className="max-w-7xl mx-auto mb-12 md:mb-20 text-center md:text-left">
          <span className="text-accent text-xs font-bold uppercase tracking-widest mb-3 block animate-fadeIn">Soluciones Integrales</span>
-         <h1 className="font-serif text-5xl md:text-7xl text-primary tracking-tight mb-6 animate-fadeInUp">
+         <h1 className="font-serif text-4xl md:text-7xl text-primary tracking-tight mb-4 md:mb-6 animate-fadeInUp">
             Más allá de la <span className="italic text-gray-400 font-light">transacción.</span>
          </h1>
-         <p className="text-gray-500 max-w-2xl text-lg font-light animate-fadeInUp delay-100">
+         <p className="text-gray-500 max-w-2xl text-base md:text-lg font-light animate-fadeInUp delay-100 mx-auto md:mx-0">
             Ofrecemos un ecosistema de servicios inmobiliarios diseñado para desarrolladores, inversionistas y propietarios que exigen excelencia en cada etapa del ciclo de vida del activo.
          </p>
       </div>
 
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
         
         {/* 1. MARKETING & DESARROLLOS (Destacado) */}
-        <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-gray-100 flex flex-col md:flex-row gap-12 items-center animate-fadeInUp">
+        <div className="bg-white rounded-3xl md:rounded-[2.5rem] p-6 md:p-12 shadow-sm border border-gray-100 flex flex-col md:flex-row gap-8 md:gap-12 items-center animate-fadeInUp">
            <div className="w-full md:w-1/2">
-              <div className="inline-flex items-center gap-2 bg-accent/10 text-accent px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest mb-6">
+              <div className="inline-flex items-center gap-2 bg-accent/10 text-accent px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 md:mb-6">
                  <Megaphone size={14} /> Desarrolladores
               </div>
-              <h2 className="font-serif text-4xl text-primary mb-6">Marketing Inmobiliario 360°</h2>
+              <h2 className="font-serif text-3xl md:text-4xl text-primary mb-4 md:mb-6">Marketing Inmobiliario 360°</h2>
               <p className="text-gray-500 font-light leading-relaxed mb-8">
                  Transformamos planos en objetos de deseo. Nuestro equipo creativo y comercial acompaña al desarrollador desde la concepción de la marca hasta la entrega de la última unidad.
               </p>
@@ -59,9 +60,14 @@ const ServicesPage: React.FC = () => {
                 <p className="text-gray-500 font-light leading-relaxed mb-6 text-sm">
                     Ya sea venta o renta, posicionamos su propiedad ante la audiencia correcta. Utilizamos nuestra red de contactos globales y herramientas tecnológicas para cerrar tratos con rapidez y discreción.
                 </p>
-                <Link to="/nosotros" className="text-accent text-xs font-bold uppercase tracking-widest hover:underline">
+                <a 
+                    href={`https://wa.me/523322275000?text=${encodeURIComponent("Hola me interesa vender mi propiedad")}`} 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent text-xs font-bold uppercase tracking-widest hover:underline"
+                >
                     Vender mi propiedad
-                </Link>
+                </a>
             </div>
 
             {/* 3. INVERSIÓN */}
@@ -164,7 +170,7 @@ const ServicesPage: React.FC = () => {
                 
                 <div className="flex flex-col md:flex-row justify-center gap-4">
                     <a 
-                        href="https://wa.me/523322275000" 
+                        href={`https://wa.me/523322275000?text=${encodeURIComponent("Hola me interesa vender mi propiedad")}`} 
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center justify-center gap-3 bg-primary text-white px-10 py-5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-accent transition-all duration-300 shadow-lg hover:-translate-y-1 group"
@@ -179,6 +185,7 @@ const ServicesPage: React.FC = () => {
             </div>
         </div>
 
+      </div>
       </div>
     </div>
   );

@@ -14,6 +14,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
      crossorigin="anonymous"></script>
@@ -68,6 +71,47 @@
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
       }
+      /* Google Maps Autocomplete Dropdown z-index fix */
+      .pac-container {
+        z-index: 10000 !important;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        border: 1px solid #f3f4f6;
+        font-family: 'DM Sans', sans-serif;
+      }
+      .pac-item {
+        padding: 10px 16px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #4b5563;
+      }
+      .pac-item:hover {
+        background-color: #f9fafb;
+      }
+      .pac-item-query {
+        font-size: 15px;
+        color: #111827;
+      }
+      
+      /* Leaflet Custom Popup Styles */
+      .custom-popup .leaflet-popup-content-wrapper {
+        padding: 0;
+        overflow: hidden;
+        border-radius: 0.75rem;
+        background: transparent;
+        box-shadow: none;
+      }
+      .custom-popup .leaflet-popup-content {
+        margin: 0;
+        width: auto !important;
+      }
+      .custom-popup .leaflet-popup-tip-container {
+        display: none;
+      }
+      .custom-price-marker {
+        background: transparent;
+        border: none;
+      }
     </style>
   <script type="importmap">
 {
@@ -83,7 +127,6 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
   <body>
     <!-- 

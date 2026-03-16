@@ -21,12 +21,13 @@ const BlogList: React.FC = () => {
   ];
 
   return (
-    <div className="bg-white min-h-screen pt-32 pb-24 font-sans text-primary">
+    <div className="pt-24 md:pt-32 pb-[14px] px-[14px] min-h-screen max-w-[100vw] flex flex-col bg-background">
+      <div className="relative w-full h-full rounded-3xl md:rounded-[3rem] overflow-hidden bg-white py-8 md:py-12 px-4 md:px-12 lg:px-20 shadow-2xl font-sans text-primary">
       
       {/* 1. MAGAZINE HEADER - Massive Typography */}
-      <div className="max-w-[1920px] mx-auto px-6 md:px-12 mb-16">
-        <div className="border-b border-black pb-8">
-            <div className="flex flex-col items-center justify-center mb-6 relative">
+      <div className="max-w-[1920px] mx-auto px-2 md:px-12 mb-8 md:mb-16">
+        <div className="border-b border-black pb-6 md:pb-8">
+            <div className="flex flex-col items-center justify-center mb-4 md:mb-6 relative">
                 {/* Decorative Issue Number */}
                 <div className="absolute top-0 left-0 hidden md:block">
                     <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Vol. 24</p>
@@ -246,21 +247,23 @@ const BlogList: React.FC = () => {
                         <p className="text-white/60 text-xs mb-6 font-light leading-relaxed px-4">
                             Inteligencia de mercado y arquitectura curada directamente a su bandeja de entrada cada lunes.
                         </p>
-                        <form className="space-y-4 relative z-10">
-                            <input 
-                                type="email" 
-                                placeholder="CORREO CORPORATIVO" 
-                                className="w-full bg-white/5 border-b border-white/20 pb-2 text-xs text-white placeholder-white/30 focus:outline-none focus:border-accent transition-colors text-center uppercase tracking-widest"
-                            />
-                            <button className="w-full bg-white text-primary text-[10px] font-bold uppercase tracking-[0.2em] py-3 hover:bg-accent hover:text-white transition-colors">
-                                Suscribirse
+                        <div className="space-y-4 relative z-10">
+                            <button 
+                                onClick={() => {
+                                    const message = `Hola me interesa suscribirme al newsletter The Weekly Brief`;
+                                    window.open(`https://wa.me/523322275000?text=${encodeURIComponent(message)}`, '_blank');
+                                }}
+                                className="w-full bg-white text-primary text-[10px] font-bold uppercase tracking-[0.2em] py-3 hover:bg-accent hover:text-white transition-colors flex items-center justify-center gap-2"
+                            >
+                                <Mail size={14} /> Suscribirse por WhatsApp
                             </button>
-                        </form>
+                        </div>
                     </div>
 
                 </div>
             </div>
         </div>
+      </div>
       </div>
     </div>
   );

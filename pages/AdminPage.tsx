@@ -129,7 +129,7 @@ const AdminPage: React.FC = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-primary flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md text-center">
            <div className="flex justify-center mb-6">
               <Logo className="text-primary h-8" />
@@ -161,7 +161,7 @@ const AdminPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex font-sans">
+    <div className="min-h-screen bg-background flex font-sans">
       
       {/* Sidebar */}
       <aside className="w-64 bg-primary text-white hidden md:flex flex-col">
@@ -196,10 +196,10 @@ const AdminPage: React.FC = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8 overflow-y-auto">
+      <main className="flex-1 p-4 md:p-8 overflow-y-auto w-full">
          
          {/* Warning Banner */}
-         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8 flex items-start gap-3">
+         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 md:mb-8 flex items-start gap-3">
             <AlertCircle className="text-blue-500 shrink-0 mt-0.5" size={20} />
             <div>
                <h4 className="text-blue-800 font-bold text-sm mb-1">Modo Local Activo</h4>
@@ -210,19 +210,32 @@ const AdminPage: React.FC = () => {
             </div>
          </div>
 
-         <div className="flex justify-between items-center mb-8">
-            <h1 className="font-serif text-3xl text-primary">Gestión de Propiedades</h1>
+         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4">
+            <h1 className="font-serif text-2xl md:text-3xl text-primary">Gestión de Propiedades</h1>
             <button 
                onClick={handleAddNew}
-               className="bg-accent text-white px-6 py-3 rounded-xl flex items-center gap-2 font-bold text-xs uppercase tracking-widest hover:bg-primary transition-colors shadow-lg"
+               className="w-full md:w-auto bg-accent text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 font-bold text-xs uppercase tracking-widest hover:bg-primary transition-colors shadow-lg"
             >
                <Plus size={16} /> Nueva Propiedad
             </button>
          </div>
 
+         {/* Mobile Sidebar Actions */}
+         <div className="md:hidden flex flex-col gap-2 mb-8 border-b border-gray-200 pb-6">
+            <button onClick={handleExport} className="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-primary text-xs font-bold uppercase tracking-widest p-3 rounded-lg transition-colors">
+               <Download size={16} /> Respaldar Datos
+            </button>
+            <button onClick={handleDeleteAll} className="w-full flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold uppercase tracking-widest p-3 rounded-lg transition-colors border border-red-200">
+               <AlertTriangle size={16} /> Borrar Todo
+            </button>
+            <button onClick={() => navigate('/')} className="w-full flex items-center justify-center gap-2 text-gray-500 hover:text-primary text-xs font-bold uppercase tracking-widest p-3">
+               <LogOut size={16} /> Salir al Sitio
+            </button>
+         </div>
+
          {/* Property Table */}
-         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-            <table className="w-full text-left">
+         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden overflow-x-auto">
+            <table className="w-full text-left min-w-[600px]">
                <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                      <th className="px-6 py-4 text-xs font-bold uppercase text-gray-500 tracking-widest">Imagen</th>
