@@ -266,13 +266,13 @@ const SmartSearch: React.FC<SmartSearchProps> = ({ variant = 'hero' }) => {
                       defaultValue={location}
                       onChange={(e: any) => setLocation(e.target.value)}
                       placeholder="¿Dónde buscas?"
-                      className="bg-transparent border-none outline-none text-sm w-full text-gray-800 placeholder-gray-400 font-medium"
+                      className="bg-transparent border-none outline-none text-base w-full text-gray-800 placeholder-gray-400 font-medium"
                       autoFocus={activeTab === 'location'}
                       fallback={
                         <input 
                           type="text" 
                           placeholder="¿Dónde buscas?" 
-                          className="bg-transparent border-none outline-none text-sm w-full text-gray-800 placeholder-gray-400 font-medium"
+                          className="bg-transparent border-none outline-none text-base w-full text-gray-800 placeholder-gray-400 font-medium"
                           value={location}
                           onChange={(e) => setLocation(e.target.value)}
                           autoFocus={activeTab === 'location'}
@@ -283,7 +283,7 @@ const SmartSearch: React.FC<SmartSearchProps> = ({ variant = 'hero' }) => {
                     <input 
                       type="text" 
                       placeholder="¿Dónde buscas?" 
-                      className="bg-transparent border-none outline-none text-sm w-full text-gray-800 placeholder-gray-400 font-medium"
+                      className="bg-transparent border-none outline-none text-base w-full text-gray-800 placeholder-gray-400 font-medium"
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
                       autoFocus={activeTab === 'location'}
@@ -409,7 +409,7 @@ const SmartSearch: React.FC<SmartSearchProps> = ({ variant = 'hero' }) => {
                                 <input 
                                   type="number" 
                                   placeholder="0" 
-                                  className="w-full bg-transparent border-none outline-none text-primary font-bold text-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                  className="w-full bg-transparent border-none outline-none text-primary font-bold text-base [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                   value={priceMin}
                                   onChange={(e) => setPriceMin(e.target.value)}
                                 />
@@ -423,7 +423,7 @@ const SmartSearch: React.FC<SmartSearchProps> = ({ variant = 'hero' }) => {
                                 <input 
                                   type="number" 
                                   placeholder="Sin límite" 
-                                  className="w-full bg-transparent border-none outline-none text-primary font-bold text-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                  className="w-full bg-transparent border-none outline-none text-primary font-bold text-base [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                   value={priceMax}
                                   onChange={(e) => setPriceMax(e.target.value)}
                                 />

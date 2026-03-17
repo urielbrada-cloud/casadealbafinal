@@ -185,14 +185,14 @@ const FloatingSearch: React.FC<FloatingSearchProps> = ({ inline = false }) => {
                             defaultValue={location}
                             onChange={(e: any) => setLocation(e.target.value)}
                             placeholder="Ingresa ubicaciones, colonias o calles"
-                            className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 pl-12 pr-4 text-sm outline-none focus:border-gray-400 focus:bg-white transition-colors"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 pl-12 pr-4 text-base outline-none focus:border-gray-400 focus:bg-white transition-colors"
                             onFocus={() => setIsExpanded(true)}
                             autoFocus
                             fallback={
                               <input 
                                 type="text" 
                                 placeholder="Ingresa ubicaciones, colonias o calles" 
-                                className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 pl-12 pr-4 text-sm outline-none focus:border-gray-400 focus:bg-white transition-colors"
+                                className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 pl-12 pr-4 text-base outline-none focus:border-gray-400 focus:bg-white transition-colors"
                                 value={location}
                                 onChange={(e) => setLocation(e.target.value)}
                                 onFocus={() => setIsExpanded(true)}
@@ -204,7 +204,7 @@ const FloatingSearch: React.FC<FloatingSearchProps> = ({ inline = false }) => {
                           <input 
                             type="text" 
                             placeholder="Ingresa ubicaciones, colonias o calles" 
-                            className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 pl-12 pr-4 text-sm outline-none focus:border-gray-400 focus:bg-white transition-colors"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 pl-12 pr-4 text-base outline-none focus:border-gray-400 focus:bg-white transition-colors"
                             value={location}
                             onChange={(e) => setLocation(e.target.value)}
                             onFocus={() => setIsExpanded(true)}
@@ -287,7 +287,7 @@ const FloatingSearch: React.FC<FloatingSearchProps> = ({ inline = false }) => {
                             <input 
                               type="number" 
                               placeholder="0" 
-                              className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-9 pr-3 text-sm outline-none focus:border-gray-400 focus:bg-white"
+                              className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-9 pr-3 text-base outline-none focus:border-gray-400 focus:bg-white"
                               value={priceMin}
                               onChange={(e) => setPriceMin(e.target.value)}
                               onFocus={() => setIsExpanded(true)}
@@ -302,7 +302,7 @@ const FloatingSearch: React.FC<FloatingSearchProps> = ({ inline = false }) => {
                             <input 
                               type="number" 
                               placeholder="Sin límite" 
-                              className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-9 pr-3 text-sm outline-none focus:border-gray-400 focus:bg-white"
+                              className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-9 pr-3 text-base outline-none focus:border-gray-400 focus:bg-white"
                               value={priceMax}
                               onChange={(e) => setPriceMax(e.target.value)}
                               onFocus={() => setIsExpanded(true)}

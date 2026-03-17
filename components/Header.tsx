@@ -22,6 +22,11 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Cerrar menú móvil al cambiar de ruta
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
+
   // Bloquear scroll cuando el menú móvil está abierto
   useEffect(() => {
     if (isMobileMenuOpen) {

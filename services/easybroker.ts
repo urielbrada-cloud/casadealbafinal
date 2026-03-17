@@ -19,7 +19,7 @@ export const fetchEasyBrokerProperties = async (params: Record<string, string> =
     return data.content.map((ebProp: any) => {
       // Find the primary operation (sale or rental)
       const operation = ebProp.operations && ebProp.operations.length > 0 ? ebProp.operations[0] : null;
-      const price = operation ? `${operation.formatted_amount} ${operation.currency}` : 'Precio a consultar';
+      const price = operation ? operation.formatted_amount : 'Precio a consultar';
       const priceRaw = operation ? operation.amount : 0;
 
       // Map property type
@@ -112,7 +112,7 @@ export const fetchEasyBrokerProperty = async (id: string): Promise<Property | nu
     const ebProp = await response.json();
     
     const operation = ebProp.operations && ebProp.operations.length > 0 ? ebProp.operations[0] : null;
-    const price = operation ? `${operation.formatted_amount} ${operation.currency}` : 'Precio a consultar';
+    const price = operation ? operation.formatted_amount : 'Precio a consultar';
     const priceRaw = operation ? operation.amount : 0;
 
     let type: 'residential' | 'commercial' | 'land' | 'development' = 'residential';
