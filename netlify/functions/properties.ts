@@ -11,11 +11,20 @@ export const handler: Handler = async (event) => {
     }
 
     // Extract propertyId if provided via redirect
-    const propertyId = event.queryStringParameters?.propertyId;
+    let propertyId = event.queryStringParameters?.propertyId;
     
+    // Fallback: Parsear del path si el redirect no inyectó el query param
+    if (!propertyId && event.path) {
+      const parts = event.path.split('/');
+      if (parts.length >= 4 && parts[1] === 'api' && parts[2] === 'properties') {
+        propertyId = parts[3];
+      }
+    }
+
     // Clean up queryStringParameters to forward to EasyBroker
     const queryParamsObj = { ...event.queryStringParameters };
     delete queryParamsObj.propertyId; // Remove our internal routing param
+    delete queryParamsObj.debug;      // Remove debug param
 
     let apiUrl = 'https://api.easybroker.com/v1/properties';
     if (propertyId) {
