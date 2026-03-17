@@ -85,7 +85,7 @@ const Header: React.FC = () => {
           
           {/* Desktop Nav - Dropdown Menu */}
           <div 
-            className="hidden xl:flex items-center relative"
+            className={`hidden xl:flex items-center relative transition-all duration-300 ${isTransparent ? '-mb-[38px]' : ''}`}
             onMouseEnter={() => setIsDesktopMenuOpen(true)}
             onMouseLeave={() => setIsDesktopMenuOpen(false)}
           >
@@ -130,13 +130,13 @@ const Header: React.FC = () => {
 
             {/* Mobile Menu Button */}
             <button 
-              className={`relative z-50 focus:outline-none p-2 flex items-center justify-center w-10 h-10 rounded-full transition-colors ${
+              className={`xl:hidden relative z-50 focus:outline-none pl-3 pr-2 py-2 flex items-center justify-center rounded-full transition-colors ${
                 isTransparent && !isMobileMenuOpen ? 'text-white drop-shadow-md hover:bg-white/20' : 'text-primary hover:bg-gray-100'
               } ${isMobileMenuOpen ? '!text-primary' : ''}`}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Menú"
             >
-              <span className="text-[11px] font-bold uppercase tracking-widest hidden xl:block mr-2">Explorar</span>
+              <span className="text-[11px] font-bold uppercase tracking-widest block mr-2">Explorar</span>
               {isMobileMenuOpen ? <X size={24} strokeWidth={2} /> : <Menu size={24} strokeWidth={2} />}
             </button>
           </div>

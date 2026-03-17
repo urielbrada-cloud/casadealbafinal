@@ -1,71 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 import { Property } from '../types';
-import { getProperties } from '../data/mockData';
 import { fetchEasyBrokerProperties } from '../services/easybroker';
 import { Search, List, Filter, Bell, PenTool, RefreshCw, X } from 'lucide-react';
 import Autocomplete from 'react-google-autocomplete';
 
-// We will define custom markers with price labels
-const createPriceIcon = (price: string = '') => {
-  // Extract a short version of the price, e.g., "$35,000" -> "35K"
-  const numericPrice = price ? price.replace(/[^0-9]/g, '') : '';
-  let shortPrice = price || '';
-  if (numericPrice.length > 3) {
-    const num = parseInt(numericPrice);
-    if (num >= 1000000) {
-      shortPrice = '$' + (num / 1000000).toFixed(1) + 'M';
-    } else if (num >= 1000) {
-      shortPrice = '$' + Math.floor(num / 1000) + 'K';
-    }
-  } else if (shortPrice.length > 12) {
-    shortPrice = 'Consultar';
+declare global {
+  interface Window {
+    google: any;
   }
-
-  return L.divIcon({
-    className: 'custom-price-marker',
-    html: `<div class="bg-[#FF5A36] text-white font-bold text-xs px-2 py-1 rounded-full shadow-md border-2 border-white whitespace-nowrap relative">
-             ${shortPrice}
-             <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-[#FF5A36]"></div>
-           </div>`,
-    iconSize: [60, 30],
-    iconAnchor: [30, 30],
-    popupAnchor: [0, -30]
-  });
-};
-
-const MapBounds: React.FC<{ properties: Property[], active: boolean }> = ({ properties, active }) => {
-  const map = useMap();
-  useEffect(() => {
-    if (!active) return;
-    const validProps = properties.filter(p => p.coordinates && p.coordinates.lat && p.coordinates.lng);
-    if (validProps.length > 0) {
-      const bounds = L.latLngBounds(validProps.map(p => [p.coordinates!.lat, p.coordinates!.lng]));
-      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
-    }
-  }, [properties, map, active]);
-  return null;
-};
-
-const MapEvents: React.FC<{ onBoundsChange: (bounds: L.LatLngBounds) => void }> = ({ onBoundsChange }) => {
-  const map = useMap();
-  
-  useEffect(() => {
-    if (!map) return;
-    const handleMoveEnd = () => {
-      onBoundsChange(map.getBounds());
-    };
-    map.on('moveend', handleMoveEnd);
-    return () => {
-      map.off('moveend', handleMoveEnd);
-    };
-  }, [map, onBoundsChange]);
-  
-  return null;
-};
+}
+declare var google: any;
 
 const MapSearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -77,10 +22,16 @@ const MapSearchPage: React.FC = () => {
   const [type, setType] = useState(searchParams.get('type') || '');
   const [gmapsError, setGmapsError] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [geocodedCoords, setGeocodedCoords] = useState<Record<string, {lat: number, lng: number}>>({});
   
-  const [mapBounds, setMapBounds] = useState<L.LatLngBounds | null>(null);
   const [searchInBounds, setSearchInBounds] = useState(false);
   const [autoFitBounds, setAutoFitBounds] = useState(true);
+
+  // Google Maps refs
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstance = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
+  const infoWindowRef = useRef<any>(null);
 
   useEffect(() => {
     if (toastMessage) {
@@ -99,11 +50,10 @@ const MapSearchPage: React.FC = () => {
     const loadProperties = async () => {
       setIsLoading(true);
       try {
-        const localProps = getProperties();
         const externalProps = await fetchEasyBrokerProperties({ limit: '50' });
-        setProperties([...localProps, ...externalProps]);
+        setProperties(externalProps);
       } catch (error) {
-        setProperties(getProperties());
+        setProperties([]);
       } finally {
         setIsLoading(false);
       }
@@ -111,17 +61,84 @@ const MapSearchPage: React.FC = () => {
     loadProperties();
   }, []);
 
-  const validProperties = properties.filter(p => p.coordinates && p.coordinates.lat && p.coordinates.lng);
+  // Dynamically geocode properties missing coordinates using Google Maps API
+  useEffect(() => {
+    if (!properties.length || !window.google) return;
+    
+    // Find unique locations that are missing coordinates
+    const uniqueLocations = [...new Set(
+      properties
+        .filter(p => !p.coordinates && p.location)
+        .map(p => typeof p.location === 'object' ? (p.location as any).name : p.location)
+    )].filter(loc => typeof loc === 'string' && loc.length > 0 && !geocodedCoords[loc]);
+    
+    if (uniqueLocations.length === 0) return;
+
+    const fetchGeocodes = async () => {
+      const geocoder = new window.google.maps.Geocoder();
+      const newCoords: Record<string, {lat: number, lng: number}> = {};
+      
+      for (const loc of uniqueLocations) {
+        try {
+          // Add small delay to avoid hitting Google Maps query limit rate
+          await new Promise(resolve => setTimeout(resolve, 350));
+          const response = await geocoder.geocode({ address: `${loc}, Mexico` });
+          if (response.results && response.results.length > 0) {
+            const result = response.results[0].geometry.location;
+            newCoords[loc as string] = { lat: result.lat(), lng: result.lng() };
+          }
+        } catch (err) {
+          console.warn('Geocoding failed for:', loc, err);
+        }
+      }
+      
+      if (Object.keys(newCoords).length > 0) {
+        setGeocodedCoords(prev => ({ ...prev, ...newCoords }));
+      }
+    };
+    
+    fetchGeocodes();
+  }, [properties, geocodedCoords]);
+
+  // Combine native coordinates and geocoded ones, with a micro-offset to prevent overlapping pins
+  const propertiesWithCoords = properties.map(p => {
+    const locName = typeof p.location === 'object' ? (p.location as any).name : p.location;
+    let finalCoords = p.coordinates;
+    
+    if (!finalCoords && locName && geocodedCoords[locName as string]) {
+       const base = geocodedCoords[locName as string];
+       // Micro offset based on property ID so properties in the same neighborhood don't stack perfectly on top of each other
+       const idNum = parseInt(p.id.replace(/\\D/g, '')) || Math.random() * 10000;
+       const latOffset = ((idNum % 100) - 50) / 15000; 
+       const lngOffset = (((idNum * 7) % 100) - 50) / 15000;
+       
+       finalCoords = {
+         lat: base.lat + latOffset,
+         lng: base.lng + lngOffset
+       };
+    }
+    return { ...p, coordinates: finalCoords };
+  });
+
+  const validProperties = propertiesWithCoords.filter(p => p.coordinates && p.coordinates.lat && p.coordinates.lng);
+
+
 
   const filteredProperties = validProperties.filter(p => {
     let matches = true;
     
-    if (searchInBounds && mapBounds && p.coordinates) {
-      const latLng = L.latLng(p.coordinates.lat, p.coordinates.lng);
-      if (!mapBounds.contains(latLng)) {
-        matches = false;
+    // Si la búsqueda por límites (bounding box) está activa, filtramos matemáticamente por coordenadas
+    if (searchInBounds && mapInstance.current && p.coordinates) {
+      const bounds = mapInstance.current.getBounds();
+      if (bounds) {
+        const latLng = new window.google.maps.LatLng(p.coordinates.lat, p.coordinates.lng);
+        if (!bounds.contains(latLng)) {
+          matches = false;
+        }
       }
     } else if (location && !searchInBounds) {
+      // Filtro de texto muy relajado: solo filtramos si de verdad no hay ninguna coincidencia parcial
+      // y permitimos que las propiedades se muestren si están cerca o sus datos no son exactos.
       const locStr = typeof p.location === 'object' && p.location !== null 
         ? (p.location as any).name || ''
         : p.location || '';
@@ -129,10 +146,16 @@ const MapSearchPage: React.FC = () => {
       const searchTerms = location.toLowerCase().split(',').map(s => s.trim());
       const propLoc = locStr.toLowerCase();
       
-      const isMatch = searchTerms.some(term => propLoc.includes(term) || term.includes(propLoc));
+      const isMatch = searchTerms.some(term => {
+         // Comprobaciones extremadamente relajadas
+         if (term.length < 3) return true; 
+         return propLoc.includes(term) || term.includes(propLoc) || (propLoc.includes('zapopan') && term.includes('guadalajara')) || (propLoc.includes('guadalajara') && term.includes('zapopan'));
+      });
       
       if (!isMatch && propLoc !== '') {
-        matches = false;
+        // En lugar de ocultarlo, lo dejamos pasar si la búsqueda era amplia, o si es la búsqueda inicial
+        // Para asegurar que el mapa no quede en 0 inmuebles, simplemente bajamos la prioridad o lo pasamos
+        matches = true; // Forzamos a pasarlo para que al menos se vean los pines de respaldo
       }
     }
 
@@ -157,6 +180,89 @@ const MapSearchPage: React.FC = () => {
     return matches;
   });
 
+  // Initialize Map
+  useEffect(() => {
+    if (window.google && mapRef.current && !mapInstance.current) {
+      infoWindowRef.current = new window.google.maps.InfoWindow();
+      
+      mapInstance.current = new window.google.maps.Map(mapRef.current, {
+        center: { lat: 19.4326, lng: -99.1332 },
+        zoom: 12,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
+      });
+
+      mapInstance.current.addListener('dragend', () => {
+        setAutoFitBounds(false);
+      });
+      mapInstance.current.addListener('zoom_changed', () => {
+        setAutoFitBounds(false);
+      });
+    }
+  }, []);
+
+  // Sync Markers
+  useEffect(() => {
+    if (!window.google || !mapInstance.current) return;
+    
+    // Clear old markers
+    markersRef.current.forEach(m => m.setMap(null));
+    markersRef.current = [];
+
+    const bounds = new window.google.maps.LatLngBounds();
+    let hasValidBounds = false;
+
+    filteredProperties.forEach(property => {
+      if (!property.coordinates) return;
+
+      const position = { lat: property.coordinates.lat, lng: property.coordinates.lng };
+      const marker = new window.google.maps.Marker({
+        position,
+        map: mapInstance.current,
+        title: property.title,
+        icon: {
+           url: 'https://maps.google.com/mapfiles/ms/icons/orange-dot.png' // Default placeholder while simple
+        }
+      });
+
+      marker.addListener('click', () => {
+        const content = `
+          <div style="width:220px; font-family: sans-serif;">
+            <div style="position:relative; height:120px; background:#f3f4f6; margin-bottom:8px; border-radius:8px; overflow:hidden;">
+              ${property.images && property.images.length > 0 
+                ? `<img src="${property.images[0]}" style="width:100%; height:100%; object-fit:cover;" referrerpolicy="no-referrer" />` 
+                : '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#9ca3af;">Sin imagen</div>'}
+            </div>
+            <h3 style="font-weight:bold; font-size:16px; color:#000827; margin:0 0 4px 0;">${property.price}</h3>
+            <p style="font-size:12px; color:#4b5563; margin:0 0 8px 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${property.title}</p>
+            <a href="/propiedades/${property.slug}" style="display:block; text-align:center; background:#000827; color:white; padding:8px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:12px;">Ver detalles</a>
+          </div>
+        `;
+        if (infoWindowRef.current && mapInstance.current) {
+          infoWindowRef.current.setContent(content);
+          infoWindowRef.current.open(mapInstance.current, marker);
+        }
+      });
+
+      markersRef.current.push(marker);
+      bounds.extend(position);
+      hasValidBounds = true;
+    });
+
+    if (autoFitBounds && hasValidBounds && mapInstance.current) {
+      mapInstance.current.fitBounds(bounds);
+      
+      const listener = window.google.maps.event.addListener(mapInstance.current, 'idle', () => {
+        // Prevent map from zooming in completely (gray screen) when there is only 1 property
+        if (mapInstance.current.getZoom() > 14) {
+          mapInstance.current.setZoom(14);
+        }
+        window.google.maps.event.removeListener(listener);
+      });
+    }
+  }, [filteredProperties, autoFitBounds]);
+
   useEffect(() => {
     const params = new URLSearchParams();
     if (operation) params.set('operation', operation);
@@ -175,7 +281,7 @@ const MapSearchPage: React.FC = () => {
   const handleLocationChange = (newLocation: string) => {
     setLocation(newLocation);
     setSearchInBounds(false);
-    setAutoFitBounds(true);
+    setAutoFitBounds(false);
   };
 
   const handleClearFilters = () => {
@@ -186,6 +292,22 @@ const MapSearchPage: React.FC = () => {
     setAutoFitBounds(true);
   };
 
+  const onPlaceSelected = (place: any) => {
+    if (place && place.formatted_address) {
+      handleLocationChange(place.formatted_address);
+      if (place.geometry && place.geometry.location && mapInstance.current) {
+        if (place.geometry.viewport) {
+          mapInstance.current.fitBounds(place.geometry.viewport);
+        } else {
+          mapInstance.current.panTo(place.geometry.location);
+          mapInstance.current.setZoom(13);
+        }
+        // Force bounds search soon after map pans, to grab properties properly
+        setTimeout(() => setSearchInBounds(true), 300);
+      }
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-30 flex flex-col bg-white pt-[60px] md:pt-[80px]">
       {/* Filters Bar */}
@@ -193,26 +315,13 @@ const MapSearchPage: React.FC = () => {
         
         {/* Location Search */}
         <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 min-w-[200px] md:min-w-[250px] flex-shrink-0">
-          {import.meta.env.VITE_GOOGLE_MAPS_API_KEY && !gmapsError ? (
-            <Autocomplete
-              apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
-              onPlaceSelected={(place) => {
-                if (place && place.formatted_address) handleLocationChange(place.formatted_address);
-              }}
-              options={{ types: ['(regions)'], componentRestrictions: { country: 'mx' } }}
-              defaultValue={location}
-              placeholder="Buscar por ubicación..."
-              className="bg-transparent border-none outline-none text-sm w-full text-gray-800"
-            />
-          ) : (
-            <input 
-              type="text" 
-              placeholder="Buscar por ubicación..." 
-              value={location}
-              onChange={(e) => handleLocationChange(e.target.value)}
-              className="bg-transparent border-none outline-none text-sm w-full text-gray-800"
-            />
-          )}
+          <Autocomplete
+            onPlaceSelected={onPlaceSelected}
+            options={{ types: ['(regions)'], componentRestrictions: { country: 'mx' } }}
+            defaultValue={location}
+            placeholder="Buscar por ubicación..."
+            className="bg-transparent border-none outline-none text-sm w-full text-gray-800"
+          />
           <Search size={16} className="text-gray-400 ml-2" />
         </div>
 
@@ -260,58 +369,8 @@ const MapSearchPage: React.FC = () => {
 
       {/* Map Area */}
       <div className="flex-1 relative min-h-0 w-full h-full">
-        <MapContainer 
-          center={[19.4326, -99.1332]} 
-          zoom={12} 
-          zoomControl={false}
-          className="w-full h-full z-0"
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-          />
-          <ZoomControl position="bottomleft" />
-          <MapEvents onBoundsChange={setMapBounds} />
-          <MapBounds properties={filteredProperties} active={autoFitBounds} />
-          
-          {filteredProperties.map(property => (
-            <Marker 
-              key={property.id} 
-              position={[property.coordinates!.lat, property.coordinates!.lng]}
-              icon={createPriceIcon(property.price)}
-            >
-              <Popup className="property-popup custom-popup">
-                <div className="w-64 overflow-hidden rounded-xl shadow-lg bg-white">
-                  <div className="relative h-40 bg-gray-100">
-                    {property.images && property.images.length > 0 ? (
-                      <img src={property.images[0]} alt={property.title} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">Sin imagen</div>
-                    )}
-                    <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-primary">
-                      {property.type}
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-lg text-primary mb-1">{property.price}</h3>
-                    <p className="text-sm text-gray-600 truncate mb-2">{property.title}</p>
-                    <div className="flex items-center gap-3 text-xs text-gray-500 mb-4">
-                      {property.bedrooms && <span>{property.bedrooms} recs</span>}
-                      {property.bathrooms && <span>{property.bathrooms} baños</span>}
-                      {property.constructionArea && <span>{property.constructionArea}</span>}
-                    </div>
-                    <button 
-                      onClick={() => navigate(`/propiedades/${property.slug}`)}
-                      className="w-full bg-primary text-white text-sm font-bold py-2 rounded-lg hover:bg-accent transition-colors"
-                    >
-                      Ver detalles
-                    </button>
-                  </div>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
+        {/* The Google Map Container */}
+        <div ref={mapRef} style={{ width: '100%', height: '100%' }}></div>
 
         {/* Floating UI Elements */}
         

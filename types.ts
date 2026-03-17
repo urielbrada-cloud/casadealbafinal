@@ -42,6 +42,8 @@ export interface Property {
   coordinates?: { lat: number; lng: number };
   googleMapsUrl?: string; // Link directo a Google Maps (Short URL)
   pointsOfInterest?: PointOfInterest[];
+  amenities?: string[]; // Legacy o specific amenidades
+  videoUrl?: string; // Link a recorrido virtual
 }
 
 export interface Development {

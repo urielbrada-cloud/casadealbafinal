@@ -1,20 +1,19 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { getProperties } from '../data/mockData';
 import { fetchEasyBrokerProperties } from '../services/easybroker';
 import { Property } from '../types';
 
 export const useProperties = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
-  const [source, setSource] = useState<'supabase' | 'mock' | 'mixed'>('mock');
+  const [source, setSource] = useState<'supabase' | 'easybroker' | 'mixed'>('easybroker');
 
   useEffect(() => {
     const fetchProperties = async () => {
       setLoading(true);
       let localData: Property[] = [];
-      let currentSource: 'supabase' | 'mock' | 'mixed' = 'mock';
+      let currentSource: 'supabase' | 'easybroker' | 'mixed' = 'easybroker';
 
       try {
         // 1. Try fetching from Supabase if configured
@@ -24,26 +23,20 @@ export const useProperties = () => {
             .select('*');
 
           if (!error && data && data.length > 0) {
-            console.log("Conectado a Supabase: Datos cargados correctamente.");
             localData = data as Property[];
             currentSource = 'supabase';
-          } else {
-            localData = getProperties();
           }
-        } else {
-          localData = getProperties();
         }
       } catch (err) {
-        console.warn("Error conectando con Supabase, usando datos de respaldo:", err);
-        localData = getProperties();
+        console.warn("Error conectando con Supabase:", err);
       }
 
       try {
         // 2. Fetch from EasyBroker
-        const externalData = await fetchEasyBrokerProperties({ limit: '10' });
+        const externalData = await fetchEasyBrokerProperties({ limit: '50' });
         if (externalData.length > 0) {
           setProperties([...localData, ...externalData]);
-          setSource('mixed');
+          setSource(localData.length > 0 ? 'mixed' : 'easybroker');
         } else {
           setProperties(localData);
           setSource(currentSource);

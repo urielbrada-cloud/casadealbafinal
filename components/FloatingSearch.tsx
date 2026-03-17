@@ -168,9 +168,9 @@ const FloatingSearch: React.FC<FloatingSearchProps> = ({ inline = false }) => {
                       <h2 className="text-xl font-serif text-primary mb-4">Ingresa ubicaciones, colonias o calles</h2>
                       <div className="relative">
                         <MapPin size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                        {import.meta.env.VITE_GOOGLE_MAPS_API_KEY && !gmapsError ? (
+                        {/* El script de Google Maps ya se inyecta globalmente en index.html, por lo tanto siempre usamos Autocomplete a menos que falle explícitamente */}
+                        {!gmapsError ? (
                           <Autocomplete
-                            apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
                             onPlaceSelected={(place) => {
                               if (place && place.formatted_address) {
                                 setLocation(place.formatted_address);

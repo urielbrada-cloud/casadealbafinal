@@ -249,9 +249,9 @@ const SmartSearch: React.FC<SmartSearchProps> = ({ variant = 'hero' }) => {
                   className={`flex-[1.5] px-4 md:px-6 py-3 rounded-2xl md:rounded-full cursor-pointer transition-all ${activeTab === 'location' ? 'bg-gray-100 md:bg-white shadow-none md:shadow-lg' : 'hover:bg-gray-50 md:hover:bg-gray-200'}`}
                 >
                   <motion.div layoutId={`search-loc-label-${variant}`} className="text-[10px] font-bold uppercase tracking-widest text-gray-800 mb-0.5">Ubicación</motion.div>
-                  {import.meta.env.VITE_GOOGLE_MAPS_API_KEY && !gmapsError ? (
+                  {/* El script de Google Maps ya se inyecta globalmente en index.html, por lo tanto siempre usamos Autocomplete a menos que falle explícitamente */}
+                  {!gmapsError ? (
                     <Autocomplete
-                      apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
                       onPlaceSelected={(place) => {
                         if (place && place.formatted_address) {
                           setLocation(place.formatted_address);

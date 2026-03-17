@@ -1,26 +1,13 @@
-import React, { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import L from 'leaflet';
+import React, { useEffect, useRef } from 'react';
 import { Property } from '../types';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-// Fix for default marker icons in react-leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
-
-// Custom icon for properties
-const customIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-black.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+declare var google: any;
 
 interface PropertyMapProps {
   properties: Property[];
@@ -29,70 +16,81 @@ interface PropertyMapProps {
   interactive?: boolean;
 }
 
-// Component to handle map bounds when properties change
-const MapBounds: React.FC<{ properties: Property[] }> = ({ properties }) => {
-  const map = useMap();
+const PropertyMap: React.FC<PropertyMapProps> = ({ properties, center = [19.4326, -99.1332], zoom = 12, interactive = true }) => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstance = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
+  const infoWindowRef = useRef<any>(null);
+  const navigate = useNavigate();
+
+  const validProperties = properties.filter(p => p.coordinates && p.coordinates.lat && p.coordinates.lng);
 
   useEffect(() => {
-    const validProps = properties.filter(p => p.coordinates && p.coordinates.lat && p.coordinates.lng);
-    if (validProps.length > 0) {
-      const bounds = L.latLngBounds(validProps.map(p => [p.coordinates!.lat, p.coordinates!.lng]));
-      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+    if (window.google && mapRef.current && !mapInstance.current) {
+      infoWindowRef.current = new window.google.maps.InfoWindow();
+
+      mapInstance.current = new window.google.maps.Map(mapRef.current, {
+        center: { lat: center[0], lng: center[1] },
+        zoom: zoom,
+        disableDefaultUI: !interactive,
+        gestureHandling: interactive ? 'auto' : 'none',
+        zoomControl: interactive,
+        mapTypeControl: false,
+        streetViewControl: false,
+      });
     }
-  }, [properties, map]);
+  }, [center, zoom, interactive]);
 
-  return null;
-};
+  useEffect(() => {
+    if (!window.google || !mapInstance.current) return;
 
-const PropertyMap: React.FC<PropertyMapProps> = ({ properties, center = [19.4326, -99.1332], zoom = 12, interactive = true }) => {
-  const validProperties = properties.filter(p => p.coordinates && p.coordinates.lat && p.coordinates.lng);
+    markersRef.current.forEach(m => m.setMap(null));
+    markersRef.current = [];
+
+    const bounds = new window.google.maps.LatLngBounds();
+    let hasValidBounds = false;
+
+    validProperties.forEach(property => {
+      const position = { lat: property.coordinates!.lat, lng: property.coordinates!.lng };
+      
+      const marker = new window.google.maps.Marker({
+        position,
+        map: mapInstance.current,
+        title: property.title,
+        icon: {
+           url: 'https://maps.google.com/mapfiles/ms/icons/orange-dot.png'
+        }
+      });
+
+      if (interactive) {
+        marker.addListener('click', () => {
+          const content = `
+            <div style="width:200px; font-family: sans-serif; cursor: pointer;" onclick="window.location.href='/propiedades/${property.slug}'">
+              <div style="height:100px; background:#f3f4f6; overflow:hidden; border-radius:8px; margin-bottom:8px;">
+                <img src="${property.images[0]}" style="width:100%; height:100%; object-fit:cover;" referrerpolicy="no-referrer" />
+              </div>
+              <h3 style="font-weight:bold; font-size:14px; margin:0 0 4px 0; color:#000827;">${property.title}</h3>
+              <p style="color:#e25c21; font-weight:bold; font-size:12px; margin:0;">${property.price}</p>
+            </div>
+          `;
+          infoWindowRef.current.setContent(content);
+          infoWindowRef.current.open(mapInstance.current, marker);
+        });
+      }
+
+      markersRef.current.push(marker);
+      bounds.extend(position);
+      hasValidBounds = true;
+    });
+
+    if (hasValidBounds && mapInstance.current && validProperties.length > 0) {
+      mapInstance.current.fitBounds(bounds);
+    }
+  }, [validProperties, interactive]);
 
   return (
     <div className="w-full h-full min-h-[500px] rounded-3xl overflow-hidden shadow-inner border border-gray-200 relative z-0">
-      <MapContainer 
-        center={center} 
-        zoom={zoom} 
-        scrollWheelZoom={interactive} 
-        dragging={interactive}
-        touchZoom={interactive}
-        doubleClickZoom={interactive}
-        zoomControl={interactive}
-        style={{ height: '100%', width: '100%', zIndex: 0 }}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-        />
-        <MapBounds properties={validProperties} />
-        
-        {validProperties.map(property => (
-          <Marker 
-            key={property.id} 
-            position={[property.coordinates!.lat, property.coordinates!.lng]}
-            icon={customIcon}
-          >
-            <Popup className="property-popup">
-              <div className="w-48 overflow-hidden rounded-lg">
-                <img 
-                  src={property.images[0]} 
-                  alt={property.title} 
-                  className="w-full h-32 object-cover"
-                />
-                <div className="p-3">
-                  <h3 className="font-serif text-sm font-bold text-primary mb-1 truncate">{property.title}</h3>
-                  <p className="text-accent font-bold text-xs mb-2">{property.price}</p>
-                  <Link 
-                    to={`/propiedades/${property.slug}`}
-                    className="block w-full text-center bg-primary text-white text-[10px] uppercase tracking-wider py-2 rounded-md hover:bg-accent transition-colors"
-                  >
-                    Ver Detalles
-                  </Link>
-                </div>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
+      <div ref={mapRef} style={{ height: '100%', width: '100%' }}></div>
     </div>
   );
 };

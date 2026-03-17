@@ -103,7 +103,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, variant = 'portra
               src={property.images && property.images.length > 0 ? property.images[currentImageIndex] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80&w=800'} 
               alt={property.title} 
               loading="lazy"
+              referrerPolicy="no-referrer"
               onLoad={() => setIsImageLoaded(true)}
+              onError={(e) => {
+                setIsImageLoaded(true);
+                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80&w=800'; // Fallback
+              }}
               className={`w-full h-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-105 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
             />
           </Link>
@@ -235,6 +240,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, variant = 'portra
                       className="w-full h-full object-cover shrink-0 snap-center pointer-events-none" 
                       alt={`${property.title} - ${idx + 1}`}
                       loading={idx === 0 ? "eager" : "lazy"}
+                      referrerPolicy="no-referrer"
                       decoding="async"
                     />
                   ))

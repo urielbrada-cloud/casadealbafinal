@@ -41,7 +41,7 @@ export const fetchEasyBrokerProperties = async (params: Record<string, string> =
         };
       } else {
         // Fallback: Generate deterministic coordinates based on location name and ID
-        const idNum = parseInt(ebProp.public_id.replace(/\D/g, '')) || Math.random() * 10000;
+        const idNum = parseInt(ebProp.public_id.replace(/\\D/g, '')) || Math.random() * 10000;
         const latOffset = ((idNum % 100) - 50) / 1000; // -0.05 to +0.05
         const lngOffset = (((idNum * 7) % 100) - 50) / 1000;
         
@@ -89,7 +89,7 @@ export const fetchEasyBrokerProperties = async (params: Record<string, string> =
         landArea: ebProp.lot_size ? `${ebProp.lot_size} m²` : undefined,
         constructionArea: ebProp.construction_size ? `${ebProp.construction_size} m²` : '0 m²',
         description: ebProp.description || '',
-        features: [], // EasyBroker summary doesn't include full features, would need detailed endpoint
+        features: [],
         images: ebProp.title_image_full ? [ebProp.title_image_full] : [],
         isFeatured: false,
         coordinates,

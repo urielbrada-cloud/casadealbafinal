@@ -82,7 +82,9 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     if (!loading && properties.length > 0) {
-      setFeaturedProperties(properties.filter(p => p.isFeatured).slice(0, 5));
+      const explicitFeatured = properties.filter(p => p.isFeatured);
+      // Fallback: If no explicit featured properties, just grab the first 5 to populate the home slider
+      setFeaturedProperties((explicitFeatured.length > 0 ? explicitFeatured : properties).slice(0, 5));
       setCommercialProperties(properties.filter(p => p.type === 'commercial'));
     }
   }, [properties, loading]);
@@ -126,6 +128,7 @@ const HomePage: React.FC = () => {
                  <img
                    src={img}
                    alt="Luxury Property"
+                   referrerPolicy="no-referrer"
                    className="w-full h-full object-cover"
                  />
                  {/* Overlays */}
@@ -291,6 +294,7 @@ const HomePage: React.FC = () => {
                           src={post.coverImage} 
                           alt={post.title} 
                           loading="lazy"
+                          referrerPolicy="no-referrer"
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                         <div className="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors duration-300" />
@@ -370,6 +374,7 @@ const HomePage: React.FC = () => {
                  <img 
                    src={dev.images[0]} 
                    alt={dev.name} 
+                   referrerPolicy="no-referrer"
                    className={`w-full h-full object-cover transition-transform duration-[10000ms] ease-out ${index === currentDevIndex ? 'scale-110' : 'scale-100'}`}
                  />
                  {/* Dark overlay for readability */}

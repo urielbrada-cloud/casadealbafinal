@@ -1,8 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { getProperties } from '../data/mockData';
-import { fetchEasyBrokerProperty } from '../services/easybroker';
+import { fetchEasyBrokerProperty, fetchEasyBrokerProperties } from '../services/easybroker';
 import { supabase } from '../lib/supabase';
 import { 
   MapPin, BedDouble, Bath, Maximize, ArrowLeft, Check, Car, 
@@ -30,23 +29,33 @@ const PropertyDetail: React.FC = () => {
     setLoading(true);
     
     const loadProperty = async () => {
-      // Load all properties for suggestions
+      // Load all properties for suggestions (EasyBroker fallback)
       let props: Property[] = [];
-      if (supabase) {
-        const { data } = await supabase.from('properties').select('*');
-        if (data && data.length > 0) {
-          props = data as Property[];
-        } else {
-          props = getProperties();
+      
+      try {
+        if (supabase) {
+          const { data } = await supabase.from('properties').select('*').limit(5);
+          if (data && data.length > 0) {
+            props = data as Property[];
+          }
         }
-      } else {
-        props = getProperties();
+      } catch (err) {
+        console.warn(err);
+      }
+
+      // If no supabase data, maybe fetch some from easybroker for suggestions?
+      if (props.length === 0) {
+          try {
+             const extProps = await fetchEasyBrokerProperties({limit: '5'});
+             props = extProps;
+          } catch(e) {}
       }
       setAllProperties(props);
 
-      // 1. Try fetching from Supabase
+      // 1. Try fetching strictly from Supabase for this property
       if (supabase) {
-        const { data, error } = await supabase
+        try {
+          const { data, error } = await supabase
           .from('properties')
           .select('*')
           .eq('slug', slug)
@@ -56,18 +65,11 @@ const PropertyDetail: React.FC = () => {
           setProperty(data as Property);
           setLoading(false);
           return;
-        }
+          }
+        } catch(e) {}
       }
 
-      // 2. Check local mock data
-      const found = props.find(p => p.slug === slug);
-      if (found) {
-        setProperty(found);
-        setLoading(false);
-        return;
-      }
-
-      // 3. If not found locally, try to fetch from EasyBroker API
+      // 2. Try to fetch from EasyBroker API
       if (slug) {
         const externalProp = await fetchEasyBrokerProperty(slug.toUpperCase());
         if (externalProp) {
@@ -194,6 +196,7 @@ const PropertyDetail: React.FC = () => {
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                   alt="Vista Principal" 
                   loading="eager"
+                  referrerPolicy="no-referrer"
                   decoding="async"
                 />
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300" />
@@ -206,23 +209,23 @@ const PropertyDetail: React.FC = () => {
 
              {/* Small Images (Right Side) */}
              <div className="col-span-1 row-span-1 relative rounded-3xl overflow-hidden cursor-pointer group shadow-sm" onClick={() => openLightbox(1)}>
-                  <img src={property.images && property.images.length > 1 ? property.images[1] : 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800'} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Vista 2"/>
+                  <img src={property.images && property.images.length > 1 ? property.images[1] : 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800'} loading="lazy" referrerPolicy="no-referrer" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Vista 2"/>
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"/>
              </div>
 
              <div className="col-span-1 row-span-1 relative rounded-3xl overflow-hidden cursor-pointer group shadow-sm" onClick={() => openLightbox(2)}>
-                  <img src={property.images && property.images.length > 2 ? property.images[2] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=800'} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Vista 3"/>
+                  <img src={property.images && property.images.length > 2 ? property.images[2] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=800'} loading="lazy" referrerPolicy="no-referrer" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Vista 3"/>
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"/>
              </div>
 
              <div className="col-span-1 row-span-1 relative rounded-3xl overflow-hidden cursor-pointer group shadow-sm" onClick={() => openLightbox(3)}>
-                  <img src={property.images && property.images.length > 3 ? property.images[3] : 'https://images.unsplash.com/photo-1600607687931-ceeb66d18f51?auto=format&fit=crop&q=80&w=800'} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Vista 4"/>
+                  <img src={property.images && property.images.length > 3 ? property.images[3] : 'https://images.unsplash.com/photo-1600607687931-ceeb66d18f51?auto=format&fit=crop&q=80&w=800'} loading="lazy" referrerPolicy="no-referrer" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Vista 4"/>
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"/>
              </div>
 
              {/* Last Image with Overlay (View Gallery) */}
              <div className="col-span-1 row-span-1 relative rounded-3xl overflow-hidden cursor-pointer group shadow-sm" onClick={() => openLightbox(0)}>
-                  <img src={property.images && property.images.length > 4 ? property.images[4] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80&w=800'} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Vista 5"/>
+                  <img src={property.images && property.images.length > 4 ? property.images[4] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80&w=800'} loading="lazy" referrerPolicy="no-referrer" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Vista 5"/>
                   
                   {/* Dark Overlay with Counter */}
                   <div className="absolute inset-0 bg-primary/60 backdrop-blur-[1px] group-hover:bg-primary/50 transition-colors flex flex-col items-center justify-center text-white">
@@ -480,6 +483,7 @@ const PropertyDetail: React.FC = () => {
                   <img 
                       src={property.images && property.images.length > 0 ? property.images[lightboxIndex] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80&w=800'} 
                       alt={`Gallery view ${lightboxIndex + 1}`} 
+                      referrerPolicy="no-referrer"
                       className="max-h-full max-w-full object-contain rounded-sm shadow-2xl"
                   />
               </div>
@@ -600,6 +604,7 @@ const MobilePropertyDetail = ({ property, handleShare }: { property: Property, h
                 className="w-full h-full object-cover shrink-0 snap-center" 
                 alt={`${property.title} - ${idx + 1}`}
                 loading={idx === 0 ? "eager" : "lazy"}
+                referrerPolicy="no-referrer"
                 decoding="async"
               />
             ))
@@ -609,6 +614,7 @@ const MobilePropertyDetail = ({ property, handleShare }: { property: Property, h
               className="w-full h-full object-cover shrink-0 snap-center" 
               alt={property.title}
               loading="eager"
+              referrerPolicy="no-referrer"
               decoding="async"
             />
           )}

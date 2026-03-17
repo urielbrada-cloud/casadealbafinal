@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import PropertyCard from '../components/PropertyCard';
 import PropertyMap from '../components/PropertyMap';
-import { getProperties } from '../data/mockData';
+
 import { fetchEasyBrokerProperties } from '../services/easybroker';
 import { Property } from '../types';
 import { SearchX, Sparkles, ArrowRight, RotateCcw, Map as MapIcon, List } from 'lucide-react';
@@ -27,19 +27,15 @@ const SearchResults: React.FC = () => {
     const loadProperties = async () => {
       setIsLoading(true);
       try {
-        // Fetch local inventory
-        const localProps = getProperties();
-        
         // Fetch external inventory from EasyBroker
         const externalProps = await fetchEasyBrokerProperties({
           limit: '20', // Fetch up to 20 properties for demo
         });
         
-        // Combine both
-        setProperties([...localProps, ...externalProps]);
+        setProperties(externalProps);
       } catch (error) {
         console.warn("Error loading properties:", error);
-        setProperties(getProperties()); // Fallback to local
+        setProperties([]); // Fallback to empty array
       } finally {
         setIsLoading(false);
       }
