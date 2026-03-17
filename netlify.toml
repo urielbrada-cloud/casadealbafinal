@@ -7,8 +7,8 @@
   NODE_VERSION = "20"
 
 [[redirects]]
-  from = "/api/properties/:id"
-  to = "/.netlify/functions/properties?propertyId=:id"
+  from = "/api/properties/*"
+  to = "/.netlify/functions/properties?propertyId=:splat"
   status = 200
   force = true
 

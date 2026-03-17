@@ -41,7 +41,7 @@ export const fetchEasyBrokerProperties = async (params: Record<string, string> =
         };
       } else {
         // Fallback: Generate deterministic coordinates based on location name and ID
-        const idNum = parseInt(ebProp.public_id.replace(/\\D/g, '')) || Math.random() * 10000;
+        const idNum = ebProp.public_id ? (parseInt(ebProp.public_id.replace(/\D/g, '')) || 0) : Math.random() * 10000;
         const latOffset = ((idNum % 100) - 50) / 1000; // -0.05 to +0.05
         const lngOffset = (((idNum * 7) % 100) - 50) / 1000;
         
@@ -133,7 +133,7 @@ export const fetchEasyBrokerProperty = async (id: string): Promise<Property | nu
       };
     } else {
       // Fallback: Generate deterministic coordinates based on location name and ID
-      const idNum = parseInt(ebProp.public_id.replace(/\D/g, '')) || Math.random() * 10000;
+      const idNum = ebProp.public_id ? (parseInt(ebProp.public_id.replace(/\D/g, '')) || 0) : Math.random() * 10000;
       const latOffset = ((idNum % 100) - 50) / 1000; // -0.05 to +0.05
       const lngOffset = (((idNum * 7) % 100) - 50) / 1000;
       
