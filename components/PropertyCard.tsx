@@ -256,18 +256,17 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, variant = 'portra
                 )}
               </div>
               
-              {/* Pagination Dots */}
-              {property.images && property.images.length > 1 && (
-                <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-2 z-10 pointer-events-none">
-                  {property.images.map((_, idx) => (
-                    <div 
-                      key={idx} 
-                      className={`w-2 h-2 rounded-full transition-all duration-300 ${idx === currentImageIndex ? 'bg-white scale-125' : 'bg-white/50'}`} 
-                    />
-                  ))}
-                </div>
-              )}
-
+              {/* Dots */}
+            {property.images && property.images.length > 1 && (
+              <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-1.5 z-10 pointer-events-none">
+                {property.images.map((_, idx) => (
+                  <div 
+                    key={idx}
+                    className={`h-1.5 rounded-full transition-all duration-300 pointer-events-auto ${idx === currentImageIndex ? 'w-4 bg-primary' : 'w-1.5 bg-gray-300'}`}
+                  />
+                ))}
+              </div>
+            )}
               <button 
                 onClick={() => setIsExpanded(false)} 
                 className="absolute top-6 left-4 bg-white p-2 rounded-full shadow-md z-10"

@@ -622,11 +622,11 @@ const MobilePropertyDetail = ({ property, handleShare }: { property: Property, h
         
         {/* Pagination Dots */}
         {property.images && property.images.length > 1 && (
-          <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-2 z-10">
+          <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-2 z-10 pointer-events-none">
             {property.images.map((_, idx) => (
               <div 
                 key={idx} 
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${idx === currentImageIndex ? 'bg-white scale-125' : 'bg-white/50'}`} 
+                className={`w-2 h-2 rounded-full transition-all duration-300 pointer-events-auto ${idx === currentImageIndex ? 'bg-white scale-125' : 'bg-white/50'}`} 
               />
             ))}
           </div>
