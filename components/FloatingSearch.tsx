@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Search, SlidersHorizontal, X, MapPin, Home, DollarSign, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
@@ -106,9 +107,10 @@ const FloatingSearch: React.FC<FloatingSearchProps> = ({ inline = false }) => {
       </div>
 
       {/* Full Screen Modal for Search (Airbnb Style Layered Sheet) */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
+      {createPortal(
+        <AnimatePresence>
+          {isOpen && (
+            <>
             {/* Backdrop */}
             <motion.div 
               initial={{ opacity: 0 }}
@@ -344,9 +346,11 @@ const FloatingSearch: React.FC<FloatingSearchProps> = ({ inline = false }) => {
               </div>
 
             </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   );
 };
