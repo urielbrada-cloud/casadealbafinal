@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { TEAM } from '../data/mockData';
+import { useTeam } from '../hooks/useTeam';
 import { Quote, Star, ArrowRight } from 'lucide-react';
 
 const AboutPage: React.FC = () => {
+  const { team: TEAM, loading } = useTeam();
 
   return (
     <div className="pt-24 md:pt-32 pb-[14px] px-[14px] min-h-screen max-w-[100vw] flex flex-col bg-background">

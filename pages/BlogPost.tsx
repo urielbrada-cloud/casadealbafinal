@@ -1,18 +1,20 @@
 
 import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { BLOG_POSTS } from '../data/mockData';
+import { useBlogPosts } from '../hooks/useBlogPosts';
 import { ArrowLeft, Share2 } from 'lucide-react';
 import AdUnit from '../components/AdUnit';
 
 const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const post = BLOG_POSTS.find(p => p.slug === slug);
+  const { posts, loading } = useBlogPosts();
+  const post = posts.find(p => p.slug === slug);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [slug]);
 
+  if (loading) return <div className="pt-40 text-center text-gray-400">Cargando...</div>;
   if (!post) return <div className="pt-40 text-center">Artículo no encontrado</div>;
 
   return (

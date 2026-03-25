@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { mapProperty } from '../lib/mappers';
 import { fetchEasyBrokerProperties } from '../services/easybroker';
 import { Property } from '../types';
 
@@ -23,7 +24,7 @@ export const useProperties = () => {
             .select('*');
 
           if (!error && data && data.length > 0) {
-            localData = data as Property[];
+            localData = data.map(mapProperty);
             currentSource = 'supabase';
           }
         }

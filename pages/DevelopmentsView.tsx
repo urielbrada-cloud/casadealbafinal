@@ -1,20 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
-import { DEVELOPMENTS } from '../data/mockData';
+import React from 'react';
+import { useDevelopments } from '../hooks/useDevelopments';
 import { Link } from 'react-router-dom';
 import { ArrowRight, MapPin, Calendar, DollarSign, Star, LayoutTemplate } from 'lucide-react';
 import FloatingSearch from '../components/FloatingSearch';
 
 const DevelopmentsView: React.FC = () => {
-  const [loading, setLoading] = useState(true);
-
-  // Simulación de carga para mostrar los Skeletons
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000); // 2 segundos de skeleton para apreciar el efecto
-    return () => clearTimeout(timer);
-  }, []);
+  const { developments: DEVELOPMENTS, loading } = useDevelopments();
 
   return (
     <div className="pt-24 md:pt-32 pb-[14px] px-[14px] min-h-screen max-w-[100vw] flex flex-col bg-background">

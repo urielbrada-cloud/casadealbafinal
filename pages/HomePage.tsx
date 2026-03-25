@@ -4,7 +4,8 @@ import SmartSearch from '../components/SmartSearch';
 import FloatingSearch from '../components/FloatingSearch';
 import PropertyCard from '../components/PropertyCard';
 import { useProperties } from '../hooks/useProperties';
-import { BLOG_POSTS, DEVELOPMENTS } from '../data/mockData';
+import { useBlogPosts } from '../hooks/useBlogPosts';
+import { useDevelopments } from '../hooks/useDevelopments';
 import { Property } from '../types';
 import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, Building2, Megaphone, Key, TrendingUp, HardHat, Scale, Building, Database } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -64,8 +65,10 @@ const SERVICES_PREVIEW = [
 ];
 
 const HomePage: React.FC = () => {
-  // Use the smart hook that decides between Supabase and Mock Data
+  // Use the smart hooks that decide between Supabase and Mock Data
   const { properties, loading, source } = useProperties();
+  const { posts: BLOG_POSTS } = useBlogPosts();
+  const { developments: DEVELOPMENTS } = useDevelopments();
   const [featuredProperties, setFeaturedProperties] = useState<Property[]>([]);
   const [commercialProperties, setCommercialProperties] = useState<Property[]>([]);
   

@@ -1,16 +1,17 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { DEVELOPMENTS } from '../data/mockData';
-import { 
-  ArrowLeft, MapPin, Download, 
-  CheckCircle2, Star, ArrowRight, MessageCircle, 
+import { useDevelopments } from '../hooks/useDevelopments';
+import {
+  ArrowLeft, MapPin, Download,
+  CheckCircle2, Star, ArrowRight, MessageCircle,
   X, ChevronLeft, ChevronRight, FileDown, ExternalLink
 } from 'lucide-react';
 
 const DevelopmentDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const development = DEVELOPMENTS.find(d => d.slug === slug);
+  const { developments, loading: devLoading } = useDevelopments();
+  const development = developments.find(d => d.slug === slug);
   
   // Tabs State
   const [activeTab, setActiveTab] = useState<'concept' | 'amenities' | 'units'>('concept');

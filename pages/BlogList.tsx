@@ -1,14 +1,19 @@
 
 import React from 'react';
-import { BLOG_POSTS } from '../data/mockData';
+import { useBlogPosts } from '../hooks/useBlogPosts';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, Calendar, User, Tag, ArrowRight, TrendingUp, Mail, Quote } from 'lucide-react';
 import AdUnit from '../components/AdUnit';
 
 const BlogList: React.FC = () => {
+  const { posts: BLOG_POSTS, loading } = useBlogPosts();
+
+  if (loading) return <div className="pt-40 text-center text-gray-400">Cargando artículos...</div>;
+  if (BLOG_POSTS.length === 0) return <div className="pt-40 text-center text-gray-400">No hay artículos disponibles.</div>;
+
   // We use the first post as the "Cover Story"
   const coverStory = BLOG_POSTS[0];
-  
+
   // The rest of the posts
   const feedPosts = BLOG_POSTS.slice(1);
 

@@ -1,9 +1,10 @@
 import React from 'react';
-import { PROPERTIES } from '../data/mockData';
+import { useProperties } from '../hooks/useProperties';
 import PropertyCard from '../components/PropertyCard';
 
 const CommercialPortfolio: React.FC = () => {
-  const commercialProps = PROPERTIES.filter(p => p.type === 'commercial');
+  const { properties, loading } = useProperties();
+  const commercialProps = properties.filter(p => p.type === 'commercial');
 
   return (
     <div className="pt-24 md:pt-32 pb-[14px] px-[14px] min-h-screen max-w-[100vw] flex flex-col bg-background">
