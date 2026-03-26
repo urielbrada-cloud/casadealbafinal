@@ -8,39 +8,87 @@ import AdUnit from '../components/AdUnit';
 // Convert markdown to HTML if content isn't already HTML
 function markdownToHtml(text: string): string {
   if (!text) return '';
-  // If it already starts with HTML tags, return as-is
-  if (text.trim().startsWith('<')) return text;
+  // If it already contains HTML block tags, return as-is
+  if (/<(p|h[1-6]|div|ul|ol|blockquote|table|section)\b/i.test(text.trim())) return text;
 
-  let html = text;
-  // Headings
-  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-  html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-  // Bold and italic
-  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  // Split into blocks by double newline
+  const blocks = text.split(/\n{2,}/);
+  const htmlBlocks: string[] = [];
+
+  for (let block of blocks) {
+    block = block.trim();
+    if (!block) continue;
+
+    // Heading
+    if (/^#{1,3}\s/.test(block)) {
+      block = block.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+      block = block.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+      block = block.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+      htmlBlocks.push(block);
+      continue;
+    }
+
+    // Blockquote
+    if (/^> /.test(block)) {
+      const content = block.replace(/^> ?/gm, '');
+      htmlBlocks.push(`<blockquote><p>${applyInline(content)}</p></blockquote>`);
+      continue;
+    }
+
+    // Unordered list
+    if (/^[-*] /.test(block)) {
+      const items = block.split('\n')
+        .filter(line => /^[-*] /.test(line))
+        .map(line => `<li>${applyInline(line.replace(/^[-*] /, ''))}</li>`);
+      htmlBlocks.push(`<ul>${items.join('')}</ul>`);
+      continue;
+    }
+
+    // Ordered list
+    if (/^\d+\. /.test(block)) {
+      const items = block.split('\n')
+        .filter(line => /^\d+\. /.test(line))
+        .map(line => `<li>${applyInline(line.replace(/^\d+\. /, ''))}</li>`);
+      htmlBlocks.push(`<ol>${items.join('')}</ol>`);
+      continue;
+    }
+
+    // Horizontal rule
+    if (/^---+$/.test(block)) {
+      htmlBlocks.push('<hr>');
+      continue;
+    }
+
+    // Image
+    if (/^!\[/.test(block)) {
+      block = block.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">');
+      htmlBlocks.push(block);
+      continue;
+    }
+
+    // Regular paragraph
+    htmlBlocks.push(`<p>${applyInline(block)}</p>`);
+  }
+
+  return htmlBlocks.join('\n');
+}
+
+// Apply inline markdown formatting
+function applyInline(text: string): string {
+  let result = text;
   // Images
-  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" />');
+  result = result.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">');
   // Links
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
-  // Blockquotes
-  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
-  // Unordered lists
-  html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
-  html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
-  // Ordered lists
-  html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
-  // Horizontal rules
-  html = html.replace(/^---$/gm, '<hr>');
-  // Paragraphs: wrap lines that aren't already wrapped in tags
-  html = html.replace(/^(?!<[a-z/])((?!^$).+)$/gm, '<p>$1</p>');
-  // Clean up empty paragraphs
-  html = html.replace(/<p>\s*<\/p>/g, '');
-  // Clean up double newlines
-  html = html.replace(/\n{2,}/g, '\n');
-
-  return html;
+  result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+  // Bold + italic
+  result = result.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  // Bold
+  result = result.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // Italic
+  result = result.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
+  // Single line breaks within a block become <br>
+  result = result.replace(/\n/g, '<br>');
+  return result;
 }
 
 const BlogPost: React.FC = () => {
