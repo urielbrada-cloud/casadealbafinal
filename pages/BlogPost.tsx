@@ -1,9 +1,47 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useBlogPosts } from '../hooks/useBlogPosts';
 import { ArrowLeft, Share2 } from 'lucide-react';
 import AdUnit from '../components/AdUnit';
+
+// Convert markdown to HTML if content isn't already HTML
+function markdownToHtml(text: string): string {
+  if (!text) return '';
+  // If it already starts with HTML tags, return as-is
+  if (text.trim().startsWith('<')) return text;
+
+  let html = text;
+  // Headings
+  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  // Bold and italic
+  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  // Images
+  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" />');
+  // Links
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+  // Blockquotes
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  // Unordered lists
+  html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+  html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+  // Ordered lists
+  html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+  // Horizontal rules
+  html = html.replace(/^---$/gm, '<hr>');
+  // Paragraphs: wrap lines that aren't already wrapped in tags
+  html = html.replace(/^(?!<[a-z/])((?!^$).+)$/gm, '<p>$1</p>');
+  // Clean up empty paragraphs
+  html = html.replace(/<p>\s*<\/p>/g, '');
+  // Clean up double newlines
+  html = html.replace(/\n{2,}/g, '\n');
+
+  return html;
+}
 
 const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -109,7 +147,7 @@ const BlogPost: React.FC = () => {
             /* Strong/Bold text: High Visibility */
             prose-strong:text-primary prose-strong:font-black prose-strong:tracking-tight prose-strong:text-[1.05em]
         ">
-           <div dangerouslySetInnerHTML={{ __html: post.content }} />
+           <div dangerouslySetInnerHTML={{ __html: markdownToHtml(post.content) }} />
         </div>
         
         {/* --- AD SPACE: Bottom Banner Content --- */}
